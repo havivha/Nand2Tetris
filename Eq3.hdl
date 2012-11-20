@@ -1,0 +1,12 @@
+/** Checks if two 3-bit input buses are equal */
+CHIP Eq3 {
+	IN a[3], b[3];
+	OUT out;	// True iff a=b
+	PARTS:
+	Xor(a=a[0], b=b[0], out=c0);
+	Xor(a=a[1], b=b[1], out=c1);
+	Xor(a=a[2], b=b[2], out=c2);
+	Or(a=c0, b=c1, out=c01);
+	Or(a=c01, b=c2, out=neq);
+	Not(in=neq, out=out);
+}
