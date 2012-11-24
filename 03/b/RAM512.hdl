@@ -1,0 +1,32 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/03/b/RAM512.hdl
+
+/**
+ * Memory of 512 registers, each 16-bit wide.  
+ * The chip facilitates read and write operations, as follows:
+ *     Read:  out(t) = RAM512[address(t)](t)
+ *     Write: If load(t-1) then RAM512[address(t-1)](t) = in(t-1)
+ * In words: the chip always outputs the value stored at the memory 
+ * location specified by address. If load == 1, the in value is loaded 
+ * into the memory location specified by address.  This value becomes 
+ * available through the out output starting from the next time step.
+ */
+
+CHIP RAM512 {
+    IN in[16], load, address[9];
+    OUT out[16];
+
+    PARTS:
+	DMux8Way(in=load, sel=address[6..8], a=loada, b=loadb, c=loadc, d=loadd, e=loade, f=loadf, g=loadg, h=loadh);
+	RAM64(in=in, load=loada, address=address[0..5], out=outa);
+	RAM64(in=in, load=loadb, address=address[0..5], out=outb);
+	RAM64(in=in, load=loadc, address=address[0..5], out=outc);
+	RAM64(in=in, load=loadd, address=address[0..5], out=outd);
+	RAM64(in=in, load=loade, address=address[0..5], out=oute);
+	RAM64(in=in, load=loadf, address=address[0..5], out=outf);
+	RAM64(in=in, load=loadg, address=address[0..5], out=outg);
+	RAM64(in=in, load=loadh, address=address[0..5], out=outh);
+	Mux8Way16(a=outa, b=outb, c=outc, d=outd, e=oute, f=outf, g=outg, h=outh, sel=address[6..8], out=out);	
+}
