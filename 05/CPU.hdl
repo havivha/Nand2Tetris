@@ -37,6 +37,6 @@ CHIP CPU {
         addressM[15],    // RAM address (of M)
         pc[15];          // ROM address (of next instruction)
 
-     PARTS:
-    // Put your code here.
+    PARTS:
+    
 }
