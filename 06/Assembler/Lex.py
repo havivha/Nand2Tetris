@@ -40,6 +40,12 @@ class Lex(object):
             self.cur_token = (self.ERROR, 0)
         return self.cur_token
         
+    def peek_token(self):
+        if self.has_next_token():
+            return self.cur_command[0]
+        else:
+            return (self.ERROR, 0)
+        
     def tokenize(self, lines):
         return [t for t in [self.tokenize_line(l) for l in lines] if t!=[]]
     

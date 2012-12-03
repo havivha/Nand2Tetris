@@ -24,14 +24,14 @@ class Parser(object):
     
     def advance(self):
         self.lex.next_command()
-        (tok_type, value) = self.lex.cur_token
+        (tok, val) = self.lex.cur_token
         self._symbol = self._dest = self._comp = self._jmp = ''
-        if tok_type == self.lex.OP and value == '@':
+        if tok == self.lex.OP and val == '@':
             self.a_command()
-        elif tok_type == self.lex.OP and value == '(':
+        elif tok == self.lex.OP and val == '(':
             self.l_command()
         else:
-            self.c_command(tok_type, value)
+            self.c_command(tok, val)
     
     A_COMMAND = 0
     C_COMMAND = 1
@@ -54,12 +54,13 @@ class Parser(object):
     def c_command(self, tok1, val1):
         self._cmd_type = self.C_COMMAND
         comp_tok, comp_val = self.get_dest(tok1, val1)
-        jump_tok, jump_val = self.get_comp(comp_tok, comp_val)
-        self.get_jump(jump_tok, jump_val)
+        self.get_comp(comp_tok, comp_val)
+        self.get_jump()
 
     def get_dest(self, tok1, val1):
-        tok2, val2 = self.lex.next_token()
+        tok2, val2 = self.lex.peek_token()
         if tok2 == self.lex.OP and val2 == '=':
+            self.lex.next_token()
             self._dest = val1
             comp_tok, comp_val = self.lex.next_token()
         else:
@@ -72,15 +73,15 @@ class Parser(object):
             self._comp = val+val2
         elif tok == self.lex.NUM or tok == self.lex.ID:
             self._comp = val
-            tok2, val2 = self.lex.next_token()
+            tok2, val2 = self.lex.peek_token()
             if tok2 == self.lex.OP and val2 != ';':
+                self.lex.next_token()
                 tok3, val3 = self.lex.next_token()
                 self._comp += val2+val3
-        jump_tok, jump_val = self.lex.next_token()
-        return (jump_tok, jump_val)
         
-    def get_jump(self, tok, val):
-        if self.lex.has_next_token():
+    def get_jump(self):
+        tok, val = self.lex.next_token()
+        if tok == self.lex.OP and val == ';':
             jump_tok, jump_val = self.lex.next_token()
             self._jmp = jump_val
         
