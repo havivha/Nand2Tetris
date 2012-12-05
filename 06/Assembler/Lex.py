@@ -2,12 +2,15 @@
 
 import re
 
+# Lexer is very simple.  Almost no error checking! - Assumes input will be program-generated.
+# Detects numbers, Ids, and operators.
+# Reads the whole .asm program into memory and uses regular expressions to match lexical tokens.
+
 class Lex(object):
     def __init__(self, file_name):
         file = open(file_name, 'r')
         self.lines = file.read()
         self.tokens = self.tokenize(self.lines.split('\n'))
-        print(self.tokens)
     
     def __str__(self):
         pass

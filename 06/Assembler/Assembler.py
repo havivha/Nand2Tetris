@@ -2,10 +2,14 @@
         
 import Parser, Code, SymbolTable, sys
 
+# Usage: Assembler.py file.asm
+# Reads file.asm and outputs file.hack - the assembled machine code as a text file.
+
 class Assembler(object):
     symbols = SymbolTable.SymbolTable()
     symbol_addr = 16
     
+    # First pass: determine memory locations of label definitions: (LABEL)
     def pass0(self, file):
         parser = Parser.Parser(file)
         cur_address = 0
@@ -17,6 +21,7 @@ class Assembler(object):
             elif cmd == parser.L_COMMAND:
                 self.symbols.add_entry( parser.symbol(), cur_address )
     
+    # Second pass: generate code and write result to output file.
     def pass1(self, infile, outfile):
         parser = Parser.Parser(infile)
         outf = open( outfile, 'w' )
@@ -32,6 +37,7 @@ class Assembler(object):
                 pass
         outf.close()
     
+    # Lookup an address - may be symbolic, or already numeric
     def get_address(self, symbol):
         if symbol.isdigit():
             return symbol
@@ -41,8 +47,8 @@ class Assembler(object):
                 self.symbol_addr += 1
             return self.symbols.get_address(symbol)
     
+    # Drive the assembly process
     def assemble(self, file):
-        print( file )
         self.symbols = SymbolTable.SymbolTable()
         self.symbol_addr = 16
         self.pass0( file )

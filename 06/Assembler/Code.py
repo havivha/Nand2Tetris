@@ -1,5 +1,9 @@
 #!/usr/local/bin/python3
 
+# Generates the code bit-strings from the parsed instruction parts.
+# The code generator just outputs a text files with one 16-bit instruction per line
+# as textual strings of 1's and 0's.
+
 class Code(object):
     def __init__(self):
         pass

@@ -2,7 +2,9 @@
 
 import Lex
 
-# Parser assumes correctly-formed input - no error checking!
+# Parser assumes correctly-formed input - no error checking!  Expects program-generated input.
+# Would do a recursive-descent parser for fun, but it's just overkill for this.
+# Parser just looks ahead one or two tokens to determine what's there.
 
 class Parser(object):
     lex = 0
@@ -22,6 +24,7 @@ class Parser(object):
     def has_more_commands(self):
         return self.lex.has_more_commands()
     
+    # Get the next entire command - each command resides on its own line.
     def advance(self):
         self.lex.next_command()
         (tok, val) = self.lex.cur_token
@@ -57,6 +60,7 @@ class Parser(object):
         self.get_comp(comp_tok, comp_val)
         self.get_jump()
 
+    # Get the 'dest' part if any.  Return the first token of the 'comp' part.
     def get_dest(self, tok1, val1):
         tok2, val2 = self.lex.peek_token()
         if tok2 == self.lex.OP and val2 == '=':
@@ -67,6 +71,7 @@ class Parser(object):
             comp_tok, comp_val = tok1, val1
         return (comp_tok, comp_val)
     
+    # Get the 'comp' part - must be present.
     def get_comp(self, tok, val):
         if tok == self.lex.OP and (val == '-' or val == '!'):
             tok2, val2 = self.lex.next_token()
@@ -79,12 +84,15 @@ class Parser(object):
                 tok3, val3 = self.lex.next_token()
                 self._comp += val2+val3
         
+    # Get the 'jump' part if any
     def get_jump(self):
         tok, val = self.lex.next_token()
         if tok == self.lex.OP and val == ';':
             jump_tok, jump_val = self.lex.next_token()
             self._jmp = jump_val
-        
+    
+    # The following functions contain the extracted parts of the command.
+    
     def command_type(self):
         return self._cmd_type 
         
