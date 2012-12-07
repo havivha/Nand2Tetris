@@ -15,7 +15,7 @@ class VMTranslator(object):
             parser.advance()
             cmd = parser.command_type()
             if cmd == C_ARITHMETIC:
-                code_writer.write_arithmetic(cmd)
+                code_writer.write_arithmetic(parser.arg1())
             elif cmd == C_PUSH:
                 code_writer.write_push_pop(cmd, parser.arg1(), parser.arg2())
 
