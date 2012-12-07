@@ -6,8 +6,9 @@ import Parser, Code, SymbolTable, sys
 # Reads file.asm and outputs file.hack - the assembled machine code as a text file.
 
 class Assembler(object):
-    symbols = SymbolTable.SymbolTable()
-    symbol_addr = 16
+    def __init__(self):
+        self.symbols = SymbolTable.SymbolTable()
+        self.symbol_addr = 16
     
     # First pass: determine memory locations of label definitions: (LABEL)
     def pass0(self, file):
@@ -30,7 +31,7 @@ class Assembler(object):
             parser.advance()
             cmd = parser.command_type()
             if cmd == parser.A_COMMAND:
-                outf.write( code.gen_a(self.get_address(parser.symbol())) + '\n' )
+                outf.write( code.gen_a(self._get_address(parser.symbol())) + '\n' )
             elif cmd == parser.C_COMMAND:
                 outf.write( code.gen_c(parser.dest(), parser.comp(), parser.jmp()) + '\n' )
             elif cmd == parser.L_COMMAND:
@@ -38,7 +39,7 @@ class Assembler(object):
         outf.close()
     
     # Lookup an address - may be symbolic, or already numeric
-    def get_address(self, symbol):
+    def _get_address(self, symbol):
         if symbol.isdigit():
             return symbol
         else:
@@ -49,12 +50,10 @@ class Assembler(object):
     
     # Drive the assembly process
     def assemble(self, file):
-        self.symbols = SymbolTable.SymbolTable()
-        self.symbol_addr = 16
         self.pass0( file )
-        self.pass1( file, self.outfile(file) )
+        self.pass1( file, self._outfile(file) )
         
-    def outfile(self, infile):
+    def _outfile(self, infile):
         if infile.endswith( '.asm' ):
             return infile.replace( '.asm', '.hack' )
         else:

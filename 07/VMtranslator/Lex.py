@@ -4,24 +4,24 @@ import re
 
 NUM     = 1     # number e.g. '123'
 ID      = 2     # symbol e.g. 'LOOP'
-OP      = 3     # = ; ( ) @ + - & | !
-ERROR   = 4     # error in file
+ERROR   = 3     # error in file
 
-# Lexer is very simple.  Almost no error checking! - Assumes input will be program-generated.
-# Detects numbers, Ids, and operators.
-# Reads the whole .asm program into memory and uses regular expressions to match lexical tokens.
+# As with the assembler, this lexer is very simple - even simpler.
+# Almost no error checking!  Assumes input will be program-generated.
+# Detects numbers and identifiers.
+# Reads the whole .vm program into memory and uses regular expressions to match lexical tokens.
 
 class Lex(object):            
     def __init__(self, file_name):
         file = open(file_name, 'r')
         self._lines = file.read()
         self._tokens = self._tokenize(self._lines.split('\n'))
-        self.cur_command = []        # list of tokens for current command
-        self.cur_token = (ERROR,0)   # current token of current command   
+        self.cur_command = []         # list of tokens for current command
+        self.cur_token = (ERROR, 0)   # current token of current command
     
     def __str__(self):
         pass
-        
+
     def has_more_commands(self):
         return self._tokens != []
         
@@ -57,22 +57,16 @@ class Lex(object):
         return self._comment.sub('', line)
 
     _num_re = r'\d+'
-    _id_start = r'\w_.$:'
-    _id_re = '['+_id_start+']['+_id_start+r'\d]*'
-    _op_re = r'[=;()@+\-&|!]'
-    _word = re.compile(_num_re+'|'+_id_re+'|'+_op_re)
+    _id_re = r'\w+'
+    _word = re.compile(_num_re+'|'+_id_re)
     def _split(self, line):
         return self._word.findall(line)
 		
     def _token(self, word):
         if   self._is_num(word):     return (NUM, word)
         elif self._is_id(word):      return (ID, word)
-        elif self._is_op(word):      return (OP, word)
         else:                        return (ERROR, word)
 			
-    def _is_op(self, word):
-        return self._is_match(self._op_re, word)
-        
     def _is_num(self, word):
         return self._is_match(self._num_re, word)
         
