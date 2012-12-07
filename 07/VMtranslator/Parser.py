@@ -52,7 +52,7 @@ class Parser(object):
         elif val in self._binary:
             self._binary_command(val)
 
-    # The following functions contain the extracted parts of the command.
+    # The following methods contain the extracted parts of the command.
     
     def command_type(self):
         return self._cmd_type 
