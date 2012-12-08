@@ -59,6 +59,13 @@ class Assembler(object):
         else:
             return infile + '.hack'    
 
-infile = sys.argv[1]
-asm = Assembler()
-asm.assemble( infile )
+main():
+    if len(sys.argv) != 2:
+        print( "Usage: Assembler file.asm" )
+    else:
+        infile = sys.argv[1]
+        
+    asm = Assembler()
+    asm.assemble( infile )
+    
+main()

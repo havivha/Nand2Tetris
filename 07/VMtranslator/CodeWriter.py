@@ -1,5 +1,6 @@
 #!/usr/local/bin/python3
 
+import os, os.path
 from VMCommands import *
 
 # CodeWriter translates VM commands into Hack assembly code
@@ -14,8 +15,8 @@ class CodeWriter(object):
         pass
         
     def set_file_name(self, filename):
-        self._vm_file = filename        # VM file currently being processed    
-                    
+        self._vm_file, ext = os.path.splitext(filename)
+
     def close_file(self):
         self._out_file.close()
         
@@ -31,21 +32,31 @@ class CodeWriter(object):
         elif command == 'not':  self._unary('!D')
         
     def write_push_pop(self, command, seg, index):
-        if command == C_PUSH:
-            if   self._is_const_seg(seg):    self._val_to_stack(str(index))
-            elif self._is_mem_seg(seg):      self._mem_to_stack(self._asm_mem_seg(seg), index)
-            elif self._is_reg_seg(seg):      self._reg_to_stack(seg, index)
-            self._inc_sp()
-        elif command == C_POP:
-            self._dec_sp()
-            if   self._is_mem_seg(seg):      self._stack_to_mem(self._asm_mem_seg(seg), index)
-            elif self._is_reg_seg(seg):      self._stack_to_reg(seg, index)
+        if command == C_PUSH:   self._push(seg, index)
+        elif command == C_POP:  self._pop(seg, index)
+
+    # Generate code for push and pop
+    def _push(self, seg, index):
+        if   self._is_const_seg(seg):   self._val_to_stack(str(index))
+        elif self._is_mem_seg(seg):     self._mem_to_stack(self._asm_mem_seg(seg), index)
+        elif self._is_reg_seg(seg):     self._reg_to_stack(seg, index)
+        elif self._is_static_seg(seg):  self._static_to_stack(seg, index)
+        self._inc_sp()
+
+    def _pop(self, seg, index):
+        self._dec_sp()
+        if   self._is_mem_seg(seg):     self._stack_to_mem(self._asm_mem_seg(seg), index)
+        elif self._is_reg_seg(seg):     self._stack_to_reg(seg, index)
+        elif self._is_static_seg(seg):  self._stack_to_static(seg, index)
 
     def _is_mem_seg(self, seg):
         return seg in ['local', 'argument', 'this', 'that']
         
     def _is_reg_seg(self, seg):
         return seg in ['pointer', 'temp']
+        
+    def _is_static_seg(self, seg):
+        return seg == 'static'
         
     def _is_const_seg(self, seg):
         return seg == 'constant'
@@ -54,6 +65,7 @@ class CodeWriter(object):
         asm_label = {'local':'LCL', 'argument':'ARG', 'this':'THIS', 'that':'THAT'}
         return asm_label[seg]
         
+    # Generate code for arithmetic and logic operations.
     # Pop args off stack, perform an operation, and push the result on the stack
     def _unary(self, comp):
         self._dec_sp()                      # --SP
@@ -112,11 +124,19 @@ class CodeWriter(object):
         self._c_command('D', 'M')                   # D=*(seg+index)
         self._comp_to_stack('D')                    # *SP=*(seg+index)
 
+    def _static_to_stack(self, seg, index):
+        self._a_command(self._static_name(index))
+        self._c_command('D', 'M')
+        self._comp_to_stack('D')
+        
     def _comp_to_stack(self, comp):
         self._load_sp()
         self._c_command('M', comp)          # *SP=comp
         
     # Methods to retrieve values from the stack
+    def _stack_to_reg(self, seg, index):
+        self._stack_to_mem(self._reg_base(seg), index, False)
+        
     def _stack_to_mem(self, seg, index, indir=True):
         self._load_seg_offset(seg, index, indir)
         self._a_command('R13')              # @R13
@@ -126,8 +146,10 @@ class CodeWriter(object):
         self._c_command('A', 'M')           # A=R13
         self._c_command('M', 'D')           # *(seg+index)=D
         
-    def _stack_to_reg(self, seg, index):
-        self._stack_to_mem(self._reg_base(seg), index, False)
+    def _stack_to_static(self, seg, index):
+        self._stack_to_dest('D')
+        self._a_command(self._static_name(index))
+        self._c_command('M', 'D')
         
     def _stack_to_dest(self, dest):
         self._load_sp()
@@ -145,6 +167,9 @@ class CodeWriter(object):
     def _reg_base(self, seg):
         reg_base = {'pointer':'3', 'temp':'5'}
         return reg_base[seg]
+        
+    def _static_name(self, index):
+        return self._vm_file+'.'+str(index)
         
     # Jump to a new label and return the label for later definition
     def _jump(self, comp, jump):
