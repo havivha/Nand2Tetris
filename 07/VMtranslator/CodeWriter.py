@@ -30,14 +30,30 @@ class CodeWriter(object):
         elif command == 'or':   self._binary('D|A')
         elif command == 'not':  self._unary('!D')
         
-    def write_push_pop(self, command, segment, index):
+    def write_push_pop(self, command, seg, index):
         if command == C_PUSH:
-            if segment == 'constant':
-                self._val_to_stack(str(index))
-                self._inc_sp()
+            if   self._is_const_seg(seg):    self._val_to_stack(str(index))
+            elif self._is_mem_seg(seg):      self._mem_to_stack(self._asm_mem_seg(seg), index)
+            elif self._is_reg_seg(seg):      self._reg_to_stack(seg, index)
+            self._inc_sp()
         elif command == C_POP:
-            pass
+            self._dec_sp()
+            if   self._is_mem_seg(seg):      self._stack_to_mem(self._asm_mem_seg(seg), index)
+            elif self._is_reg_seg(seg):      self._stack_to_reg(seg, index)
 
+    def _is_mem_seg(self, seg):
+        return seg in ['local', 'argument', 'this', 'that']
+        
+    def _is_reg_seg(self, seg):
+        return seg in ['pointer', 'temp']
+        
+    def _is_const_seg(self, seg):
+        return seg == 'constant'
+        
+    def _asm_mem_seg(self, seg):
+        asm_label = {'local':'LCL', 'argument':'ARG', 'this':'THIS', 'that':'THAT'}
+        return asm_label[seg]
+        
     # Pop args off stack, perform an operation, and push the result on the stack
     def _unary(self, comp):
         self._dec_sp()                      # --SP
@@ -77,23 +93,58 @@ class CodeWriter(object):
     def _dec_sp(self):
         self._a_command('SP')               # A=&SP
         self._c_command('M', 'M-1')         # SP=SP-1
-        
+
+    def _load_sp(self):
+        self._a_command('SP')               # A=&SP
+        self._c_command('A', 'M')           # A=SP
+
+    # Methods to store values onto the stack        
     def _val_to_stack(self, val):
         self._a_command(val)                # A=val
         self._c_command('D', 'A')           # D=A
         self._comp_to_stack('D')            # *SP=D
 
+    def _reg_to_stack(self, seg, index):
+        self._mem_to_stack(self._reg_base(seg), index, False)
+        
+    def _mem_to_stack(self, seg, index, indir=True):
+        self._load_seg_offset(seg, index, indir)    # A=seg+index
+        self._c_command('D', 'M')                   # D=*(seg+index)
+        self._comp_to_stack('D')                    # *SP=*(seg+index)
+
     def _comp_to_stack(self, comp):
         self._load_sp()
         self._c_command('M', comp)          # *SP=comp
+        
+    # Methods to retrieve values from the stack
+    def _stack_to_mem(self, seg, index, indir=True):
+        self._load_seg_offset(seg, index, indir)
+        self._a_command('R13')              # @R13
+        self._c_command('M', 'D')           # M=D
+        self._stack_to_dest('D')            # D=*SP
+        self._a_command('R13')              # @R13
+        self._c_command('A', 'M')           # A=R13
+        self._c_command('M', 'D')           # *(seg+index)=D
+        
+    def _stack_to_reg(self, seg, index):
+        self._stack_to_mem(self._reg_base(seg), index, False)
         
     def _stack_to_dest(self, dest):
         self._load_sp()
         self._c_command(dest, 'M')          # dest=*SP
         
-    def _load_sp(self):
-        self._a_command('SP')               # A=&SP
-        self._c_command('A', 'M')           # A=SP
+    # load address of seg+index into A and D registers
+    def _load_seg_offset(self, seg, index, indir=True):
+        self._a_command(str(index))         # A=index
+        self._c_command('D', 'A')           # D=A
+        self._a_command(seg)                # A=seg
+        if indir:
+            self._c_command('A', 'M')       # A=*seg
+        self._c_command('AD', 'D+A')        # A=D=seg+index
+    
+    def _reg_base(self, seg):
+        reg_base = {'pointer':'3', 'temp':'5'}
+        return reg_base[seg]
         
     # Jump to a new label and return the label for later definition
     def _jump(self, comp, jump):
