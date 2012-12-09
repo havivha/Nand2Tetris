@@ -1,6 +1,6 @@
 #!/usr/local/bin/python3
 
-# These are the VM translator commands
+# VM translator constants
 
 # Command types
 C_ARITHMETIC = 0

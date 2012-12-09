@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
 
 import Lex
-from VMCommands import *
+from VMConstant import *
 
 # Parser assumes correctly-formed input - no error checking!  Expects program-generated input.
 # Would do a recursive-descent parser for fun, but as with the assembler, it's just overkill for this.

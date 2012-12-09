@@ -2,7 +2,7 @@
 
 import sys, os, os.path, glob
 import Parser, CodeWriter
-from VMCommands import *
+from VMConstant import *
 
 class VMTranslator(object):
     def __init__(self):

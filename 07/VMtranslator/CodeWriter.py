@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
 
 import os, os.path
-from VMCommands import *
+from VMConstant import *
 
 # CodeWriter translates VM commands into Hack assembly code
 
@@ -20,6 +20,12 @@ class CodeWriter(object):
     def close_file(self):
         self._out_file.close()
         
+    def write_init(self):
+        self._a_command('256')
+        self._c_command('D', 'A')
+        self._comp_to_reg(R_SP, 'D')        # SP=256
+        self.write_call('Sys.init', 0)      # call Sys.init
+        
     def write_arithmetic(self, command):
         if   command == 'add':  self._binary('D+A')
         elif command == 'sub':  self._binary('A-D')
@@ -35,12 +41,6 @@ class CodeWriter(object):
         if command == C_PUSH:   self._push(seg, index)
         elif command == C_POP:  self._pop(seg, index)
 
-    def write_init(self):
-        self._a_command('256')
-        self._c_command('D', 'A')
-        self._comp_to_reg(R_SP, 'D')        # SP=256
-        self.write_call('Sys.init', 0)      # call Sys.init
-        
     def write_label(self, label):
         self._l_command(label)
         
@@ -114,6 +114,7 @@ class CodeWriter(object):
         self._dec_sp()
         self._stack_to_dest(dest)           # dest=*SP
 
+    # Types of segments
     def _is_mem_seg(self, seg):
         return seg in [S_LCL, S_ARG, S_THIS, S_THAT]
         
@@ -126,13 +127,6 @@ class CodeWriter(object):
     def _is_const_seg(self, seg):
         return seg == S_CONST
 
-    def _asm_mem_seg(self, seg):
-        asm_label = {S_LCL:'LCL', S_ARG:'ARG', S_THIS:'THIS', S_THAT:'THAT'}
-        return asm_label[seg]
-
-    def _asm_reg(self, regnum):
-        return 'R'+str(regnum)
-        
     # Generate code for arithmetic and logic operations.
     # Pop args off stack, perform an operation, and push the result on the stack
     def _unary(self, comp):
@@ -185,13 +179,13 @@ class CodeWriter(object):
         self._comp_to_stack('D')            # *SP=D
 
     def _reg_to_stack(self, seg, index):
-        self._reg_to_dest('D', self._reg_num(seg, index))    # D=R#
-        self._comp_to_stack('D')                    # *SP=D
+        self._reg_to_dest('D', self._reg_num(seg, index))   # D=R#
+        self._comp_to_stack('D')                            # *SP=D
         
     def _mem_to_stack(self, seg, index, indir=True):
-        self._load_seg_offset(seg, index, indir)    # A=seg+index
-        self._c_command('D', 'M')                   # D=*(seg+index)
-        self._comp_to_stack('D')                    # *SP=*(seg+index)
+        self._load_seg(seg, index, indir)   # A=seg+index
+        self._c_command('D', 'M')           # D=*(seg+index)
+        self._comp_to_stack('D')            # *SP=*(seg+index)
 
     def _static_to_stack(self, seg, index):
         self._a_command(self._static_name(index))   # A=&func.#
@@ -208,7 +202,7 @@ class CodeWriter(object):
         self._comp_to_reg(self._reg_num(seg, index), 'D')
 
     def _stack_to_mem(self, seg, index, indir=True):
-        self._load_seg_offset(seg, index, indir)
+        self._load_seg(seg, index, indir)
         self._comp_to_reg(R_COPY, 'D')      # R_COPY=D
         self._stack_to_dest('D')            # D=*SP
         self._reg_to_dest('A', R_COPY)      # A=R_COPY
@@ -223,26 +217,33 @@ class CodeWriter(object):
         self._load_sp()
         self._c_command(dest, 'M')          # dest=*SP
 
-    # Offset *SP by given offset
+    # Calculate SP+/-offset
     def _load_sp_offset(self, offset):
-        self._load_seg_offset(self._asm_reg(R_SP), offset)
+        self._load_seg(self._asm_reg(R_SP), offset)
 
     # load address of seg+index into A and D registers
-    def _load_seg_offset(self, seg, index, indir=True):
+    def _load_seg(self, seg, index, indir=True):
         if index == 0:
-            self._a_command(seg)            # A=seg
-            if indir: self._indir(dest='AD')# A=*A
+            self._load_seg_no_index(seg, indir)
         else:
-            comp = 'D+A'
-            if index < 0:
-                index = -index
-                comp = 'A-D'
-            self._a_command(str(index))     # A=index
-            self._c_command('D', 'A')       # D=A
-            self._a_command(seg)            # A=seg
-            if indir: self._indir()         # A=*seg
-            self._c_command('AD', comp)    # A=D=seg+/-index
+            self._load_seg_index(seg, index, indir)
 
+    def _load_seg_no_index(self, seg, indir):
+        self._a_command(seg)            # A=seg
+        if indir: self._indir(dest='AD')# A=D=*A
+
+    def _load_seg_index(self, seg, index, indir):
+        comp = 'D+A'
+        if index < 0:
+            index = -index
+            comp = 'A-D'
+        self._a_command(str(index))     # A=index
+        self._c_command('D', 'A')       # D=A
+        self._a_command(seg)            # A=seg
+        if indir: self._indir()         # A=*seg
+        self._c_command('AD', comp)     # A=D=seg+/-index
+    
+    # Register ops
     def _reg_to_dest(self, dest, reg):
         self._a_command(self._asm_reg(reg)) # @R#
         self._c_command(dest, 'M')          # dest=R#
@@ -267,6 +268,14 @@ class CodeWriter(object):
         
     def _static_name(self, index):
         return self._vm_file+'.'+str(index)
+        
+    # Assembler names for segments/registers
+    def _asm_mem_seg(self, seg):
+        asm_label = {S_LCL:'LCL', S_ARG:'ARG', S_THIS:'THIS', S_THAT:'THAT'}
+        return asm_label[seg]
+
+    def _asm_reg(self, regnum):
+        return 'R'+str(regnum)
         
     # Jump to a new label and return the label for later definition
     def _jump(self, comp, jump):
