@@ -57,7 +57,7 @@ class Lex(object):
         return self._comment.sub('', line)
 
     _num_re = r'\d+'
-    _id_re = r'\w+'
+    _id_re = r'[\w\-.]+'
     _word = re.compile(_num_re+'|'+_id_re)
     def _split(self, line):
         return self._word.findall(line)
