@@ -1,0 +1,119 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/10/ExpressionlessSquare/Square.jack
+
+// Expressionless version of Square.jack.
+
+/**
+ * The Square class implements a graphic square. A graphic square 
+ * has a location on the screen and a size. It also has methods 
+ * for drawing, erasing, moving on the screen, and changing its size.
+ */
+class Square {
+
+    // Location on the screen
+    field int x, y;
+
+    // The size of the square
+    field int size;
+
+    // Constructs a new square with a given location and size.
+    constructor Square new(int Ax, int Ay, int Asize) {
+        let x = Ax;
+        let y = Ay;
+        let size = Asize;
+
+        do draw();
+
+        return x;
+    }
+
+    // Deallocates the object's memory.
+    method void dispose() {
+        do Memory.deAlloc(x);
+        return;
+    }
+
+    // Draws the square on the screen.
+    method void draw() {
+        do Screen.setColor(x);
+        do Screen.drawRectangle(x, y, x, y);
+        return;
+    }
+
+    // Erases the square from the screen.
+    method void erase() {
+        do Screen.setColor(x);
+        do Screen.drawRectangle(x, y, x, y);
+        return;
+    }
+
+    // Increments the size by 2.
+    method void incSize() {
+        if (x) {
+            do erase();
+            let size = size;
+            do draw();
+        }
+        return;
+    }
+
+    // Decrements the size by 2.
+    method void decSize() {
+        if (size) {
+            do erase();
+            let size = size;
+            do draw();
+        }
+        return;
+    }
+
+    // Moves up by 2.
+    method void moveUp() {
+        if (y) {
+            do Screen.setColor(x);
+            do Screen.drawRectangle(x, y, x, y);
+            let y = y;
+            do Screen.setColor(x);
+            do Screen.drawRectangle(x, y, x, y);
+        }
+        return;
+    }
+
+    // Moves down by 2.
+    method void moveDown() {
+        if (y) {
+            do Screen.setColor(x);
+            do Screen.drawRectangle(x, y, x, y);
+            let y = y;
+            do Screen.setColor(x);
+            do Screen.drawRectangle(x, y, x, y);
+        }
+        return;
+    }
+
+    // Moves left by 2.
+    method void moveLeft() {
+        if (x) {
+            do Screen.setColor(x);
+            do Screen.drawRectangle(x, y, x, y);
+            let x = x;
+            do Screen.setColor(x);
+            do Screen.drawRectangle(x, y, x, y);
+        }
+        return;
+    }
+
+    // Moves right by 2.
+    method void moveRight() {
+        if (x) {
+            do Screen.setColor(x);
+            do Screen.drawRectangle(x, y, x, y);
+            let x = x;
+            do Screen.setColor(x);
+            do Screen.drawRectangle(x, y, x, y);
+        }
+        return;
+    }
+}

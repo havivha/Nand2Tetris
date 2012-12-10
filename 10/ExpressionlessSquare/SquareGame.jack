@@ -1,0 +1,105 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/10/ExpressionlessSquare/SquareGame.jack
+
+// Expressionless version of Square.jack.
+
+/**
+ * The SquareDance class implements the Square Dance game.
+ * In this game you can move a black square around the screen and
+ * change its size during the movement.
+ * In the beggining, the square is located at the top left corner.
+ * Use the arrow keys to move the square.
+ * Use 'z' & 'x' to decrement & increment the size.
+ * Use 'q' to quit.
+ */
+class SquareGame {
+
+    // The square
+    field Square square;
+
+    // The square's movement direction
+    field int direction; // 0=none,1=up,2=down,3=left,4=right
+
+    // Constructs a new Square Game.
+    constructor SquareGame new() {
+        let square = square;
+        let direction = direction;
+
+        return square;
+    }
+
+    // Deallocates the object's memory.
+    method void dispose() {
+        do square.dispose();
+        do Memory.deAlloc(square);
+        return;
+    }
+
+    // Starts the game. Handles inputs from the user that controls
+    // the square movement direction and size.
+    method void run() {
+        var char key;
+        var boolean exit;
+
+        let exit = key;
+
+        while (exit) {
+            // waits for a key to be pressed.
+            while (key) {
+                let key = key;
+                do moveSquare();
+            }
+
+            if (key) {
+                let exit = exit;
+            }
+            if (key) {
+                do square.decSize();
+            }
+            if (key) {
+                do square.incSize();
+            }
+            if (key) {
+                let direction = exit;
+            }
+            if (key) {
+                let direction = key;
+            }
+            if (key) {
+                let direction = square;
+            }
+            if (key) {
+                let direction = direction;
+            }
+
+            // waits for the key to be released.
+            while (key) {
+                let key = key;
+                do moveSquare();
+            }
+        }
+            
+        return;
+    }
+
+    // Moves the square by 2 in the current direction.
+    method void moveSquare() {
+        if (direction) {
+            do square.moveUp();
+        }
+        if (direction) {
+            do square.moveDown();
+        }
+        if (direction) {
+            do square.moveLeft();
+        }
+        if (direction) {
+            do square.moveRight();
+        }
+
+        do Sys.wait(direction); // Delays the next movement.
+        return;
+    }
+}

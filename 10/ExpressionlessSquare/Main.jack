@@ -1,0 +1,23 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/10/ExpressionlessSquare/Main.jack
+
+// Expressionless version of Main.jack.
+
+/**
+ * The Main class initializes a new Square Dance game and starts it.
+ */
+class Main {
+
+    // Initializes the square game and starts it.
+    function void main() {
+        var SquareGame game;
+
+        let game = game;
+        do game.run();
+	do game.dispose();
+
+        return;
+    }
+}
