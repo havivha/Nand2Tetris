@@ -54,6 +54,6 @@ def get_files( file_or_dir ):
     if file_or_dir.endswith('.vm'):
         return [file_or_dir], file_or_dir.replace('.vm', '.asm')
     else:
-        return glob.glob(file_or_dir+'/*.vm'), file_or_dir+'.asm'
+        return glob.glob(file_or_dir+'/*.vm'), file_or_dir+'/'+file_or_dir+'.asm'
 
 main()
