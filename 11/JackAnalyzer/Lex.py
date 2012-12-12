@@ -12,6 +12,7 @@ class Lex(object):
         infile = open(file, 'r')
         self._lines = infile.read()
         self._tokens = self._tokenize(self._lines)
+        self._tokens.reverse()
         self._token_type = T_ERROR  # Current token type
         self._cur_val = 0           # Current token value
     
@@ -31,7 +32,7 @@ class Lex(object):
         
     def advance(self):
         if self.has_more_tokens():
-            self._token_type, self._cur_val = self._tokens.pop(0)
+            self._token_type, self._cur_val = self._tokens.pop()
         else:
             self._token_type, self._cur_val = (T_ERROR, 0)
         self._writexml()
@@ -39,7 +40,7 @@ class Lex(object):
         
     def peek(self):
         if self.has_more_tokens():
-            return self._tokens[0]
+            return self._tokens[-1]
         else:
             return (T_ERROR, 0)
 
@@ -85,12 +86,12 @@ class Lex(object):
     def _remove_comments(self, line):
         return self._comment_re.sub('', line)
 
-    _keyword_re = '|'.join(keywords)
+    _keyword_re = '|'.join([k+r'(?=\s)' for k in keywords])
     _sym_re = '['+re.escape(symbols)+']'
     _num_re = r'\d+'
     _str_re = r'"[^"\n]*"'
-    _id_re = r'[\w\-]+'
-    _word = re.compile(_keyword_re+'|'+_sym_re+'|'+_num_re+'|'+_str_re+'|'+_id_re)
+    _id_re = r'[a-zA-Z_]\w*'
+    _word = re.compile(_keyword_re+'|'+_id_re+'|'+_sym_re+'|'+_num_re+'|'+_str_re)
     def _split(self, line):
         return self._word.findall(line)
 
@@ -103,7 +104,7 @@ class Lex(object):
         else:                           return (T_ERROR, word)
 
     def _is_keyword(self, word):
-        return self._is_match(self._keyword_re, word)
+        return word in keywords     # Don't match _keyword_re in this case.
         
     def _is_sym(self, word):
         return self._is_match(self._sym_re, word)

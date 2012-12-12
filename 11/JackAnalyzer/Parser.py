@@ -1,6 +1,8 @@
 #!/usr/local/bin/python3
 
-import Lex, os, os.path
+import Lex
+from SymbolTable import *
+import os, os.path
 from xml.sax.saxutils import escape
 from JackConstant import *
 
@@ -13,9 +15,11 @@ class ParserError(Exception):
 class Parser(object):
     def __init__(self, file):
         self.lex = Lex.Lex(file)
+        self.symbols = SymbolTable()
         self.openout(file)
         self.compile_class()
         self.closeout()
+        print(self.symbols)
         
     def __str__(self):
         pass
@@ -23,13 +27,13 @@ class Parser(object):
     # Routines to advance the token
     def _require(self, tok, val=None):
         lextok, lexval = self._advance()
-        if tok != lextok or ((tok == T_KEYWORD or tok == T_SYM) and val != lexval):
+        if tok != lextok or tok in (T_KEYWORD, T_SYM) and val != lexval:
             raise ParserError(self._require_failed_msg(tok, val))
         else:
             return lexval
             
     def _require_failed_msg(self, tok, val):
-        if val == None: val = tok
+        if val == None: val = tokens[tok]
         return 'Expected '+val
     
     def _advance(self):
@@ -39,10 +43,15 @@ class Parser(object):
 
     def _is_token(self, tok, val=None):
         lextok, lexval = self.lex.peek()
-        if val == None:
-            return lextok == tok
-        else:
-            return (lextok, lexval) == (tok, val)
+        return val == None and lextok == tok or (lextok, lexval) == (tok, val)
+    
+    def _is_keyword(self, *keywords):
+        lextok, lexval = self.lex.peek()
+        return lextok == T_KEYWORD and lexval in keywords
+        
+    def _is_sym(self, symbols):
+        lextok, lexval = self.lex.peek()
+        return lextok == T_SYM and lexval in symbols
         
     # Write XML output        
     def openout(self, path):
@@ -65,17 +74,17 @@ class Parser(object):
     _parsed_rules = []
     def _start_non_terminal(self, rule):
         self._outfile.write('<'+rule+'>\n')
-        self._parsed_rules = [rule] + self._parsed_rules
+        self._parsed_rules.append(rule)
         
     def _end_non_terminal(self):
-        rule = self._parsed_rules.pop(0)
+        rule = self._parsed_rules.pop()
         self._outfile.write('</'+rule+'>\n')
 
     # Parser and compile Jack code        
     def compile_class(self):
         self._start_non_terminal('class')
         self._require(T_KEYWORD, KW_CLASS)
-        class_name = self._require(T_ID)
+        self._require(T_ID)    # Class names don't have to go into the symbol table
         self._require(T_SYM, '{')
         while self._is_class_var_dec():
             self.compile_class_var_dec()
@@ -83,57 +92,63 @@ class Parser(object):
             self.compile_subroutine()
         self._require(T_SYM, '}')
         self._end_non_terminal()
-        
+
     # Variable declarations
     def _is_class_var_dec(self):
-        return self._is_token(T_KEYWORD, KW_STATIC) or self._is_token(T_KEYWORD, KW_FIELD)
+        return self._is_keyword(KW_STATIC, KW_FIELD)
             
     def compile_class_var_dec(self):
         self._start_non_terminal('classVarDec')
         tok, kwd = self._advance()      # static | field
-        self._compile_dec()
+        if kwd == KW_STATIC: kind = SK_STATIC
+        else:                kind = SK_FIELD
+        self._compile_dec(kind)
         self._end_non_terminal()
         
-    def _compile_dec(self):
-        self.compile_type();
-        self.compile_var_name()
-        while self._is_token(T_SYM, ','):
-            self._require(T_SYM, ',')
-            self.compile_var_name()
+    def _compile_dec(self, kind):
+        type = self.compile_type();
+        name = self.compile_var_name()
+        self.symbols.define(name, type, kind)
+        while self._is_sym(','):
+            self._advance()
+            name = self.compile_var_name()
+            self.symbols.define(name, type, kind)
         self._require(T_SYM, ';')
     
     def _is_type(self):
-        tok, val = self.lex.peek()
-        return tok == T_KEYWORD and (val == KW_INT or val == KW_CHAR or val == KW_BOOLEAN) or tok == T_ID
+        return self._is_token(T_ID) or self._is_keyword(KW_INT, KW_CHAR, KW_BOOLEAN)
 
-    def compile_type(self):
-        if self._is_type():
-            return self._advance()
+    def compile_void_or_type(self):
+        if self._is_keyword(KW_VOID):
+            return self._advance()[1]
         else:
+            return self.compile_type()
+            
+    def compile_type(self):
+        if self._is_type(): 
+            return self.type_of(*self._advance())
+        else:               
             raise ParserError(self._require_failed_msg(*self.lex.peek()))
         
-    def compile_void_or_type(self):
-        if self._is_token(T_KEYWORD, KW_VOID):
-            return self._advance()
-        else:
-            self.compile_type()
+    def type_of(self, tok, val):
+        return val
             
     def _is_var_name(self):
         return self._is_token(T_ID)
         
     def compile_var_name(self):
-        self._require(T_ID)
+        return self._require(T_ID)
         
     # Subroutine declarations
     def _is_subroutine(self):
-        tok, kwd = self.lex.peek()
-        return tok == T_KEYWORD and (kwd == KW_CONSTRUCTOR or kwd == KW_FUNCTION or kwd == KW_METHOD)
+        return self._is_keyword(KW_CONSTRUCTOR, KW_FUNCTION, KW_METHOD)
         
     def compile_subroutine(self):
         self._start_non_terminal('subroutineDec')
         kwd = self._advance()
-        self.compile_void_or_type()
-        self.compile_var_name()
+        type = self.compile_void_or_type()
+        name = self.compile_var_name()
+        self.symbols.start_subroutine()
         self._require(T_SYM, '(')
         self.compile_parameter_list()
         self._require(T_SYM, ')')
@@ -143,15 +158,16 @@ class Parser(object):
     def compile_parameter_list(self):
         self._start_non_terminal('parameterList')
         self.compile_parameter()
-        while self._is_token(T_SYM, ','):
+        while self._is_sym(','):
             self._advance()
             self.compile_parameter()
         self._end_non_terminal()
               
     def compile_parameter(self):
         if self._is_type():
-            self.compile_type()
-            self.compile_var_name()
+            type = self.compile_type()
+            name = self.compile_var_name()
+            self.symbols.define(name, type, SK_ARG)
             
     def compile_subroutine_body(self):
         self._start_non_terminal('subroutineBody')
@@ -163,12 +179,12 @@ class Parser(object):
         self._end_non_terminal()
         
     def _is_var_dec(self):
-        return self._is_token(T_KEYWORD, KW_VAR)
+        return self._is_keyword(KW_VAR)
         
     def compile_var_dec(self):
         self._start_non_terminal('varDec')
         self._require(T_KEYWORD, KW_VAR)
-        self._compile_dec()
+        self._compile_dec(SK_VAR)
         self._end_non_terminal()
         
     # Statements
@@ -189,7 +205,7 @@ class Parser(object):
         elif self._is_return(): self.compile_return()
         
     def _is_do(self):
-        return self._is_token(T_KEYWORD, KW_DO)
+        return self._is_keyword(KW_DO)
         
     def compile_do(self):
         self._start_non_terminal('doStatement')
@@ -200,13 +216,13 @@ class Parser(object):
         self._end_non_terminal()
         
     def _is_let(self):
-        return self._is_token(T_KEYWORD, KW_LET)
+        return self._is_keyword(KW_LET)
         
     def compile_let(self):
         self._start_non_terminal('letStatement')
         self._require(T_KEYWORD, KW_LET)
         self.compile_var_name()
-        if self._is_token(T_SYM, '['):
+        if self._is_sym('['):
             self._advance()
             self.compile_expression()
             self._require(T_SYM, ']')
@@ -216,7 +232,7 @@ class Parser(object):
         self._end_non_terminal()
         
     def _is_while(self):
-        return self._is_token(T_KEYWORD, KW_WHILE)
+        return self._is_keyword(KW_WHILE)
         
     def compile_while(self):
         self._start_non_terminal('whileStatement')
@@ -225,26 +241,28 @@ class Parser(object):
         self._end_non_terminal()
         
     def _is_return(self):
-        return self._is_token(T_KEYWORD, KW_RETURN)
+        return self._is_keyword(KW_RETURN)
         
     def compile_return(self):
         self._start_non_terminal('returnStatement')
         self._require(T_KEYWORD, KW_RETURN)
-        if not self._is_token(T_SYM, ';'):
+        if not self._is_sym(';'):
             self.compile_expression()
         self._require(T_SYM, ';')
         self._end_non_terminal()
         
     def _is_if(self):
-        return self._is_token(T_KEYWORD, KW_IF)
+        return self._is_keyword(KW_IF)
         
     def compile_if(self):
         self._start_non_terminal('ifStatement')
         self._require(T_KEYWORD, KW_IF)
         self._compile_cond_expression_statements()
-        if self._is_token(T_KEYWORD, KW_ELSE):
+        if self._is_keyword(KW_ELSE):
             self._advance()
+            self._require(T_SYM, '{')
             self.compile_statements()
+            self._require(T_SYM, "}")
         self._end_non_terminal()
 
     def _compile_cond_expression_statements(self):
@@ -267,14 +285,19 @@ class Parser(object):
         self._end_non_terminal()
         
     def _is_term(self):
-        return self._is_token(T_NUM) or self._is_token(T_STR) or self._is_keyword_constant()    \
-            or self._is_var_name() or self._is_token(T_SYM, '(') or self._is_unary_op()
+        return self._is_const() or self._is_var_name() or self._is_sym('(') or self._is_unary_op()
         
+    def _is_const(self):
+        return self._is_token(T_NUM) or self._is_token(T_STR) or self._is_keyword_constant()
+        
+    def _is_keyword_constant(self):
+        return self._is_keyword(KW_TRUE, KW_FALSE, KW_NULL, KW_THIS)
+
     def compile_term(self):
         self._start_non_terminal('term')
-        if self._is_token(T_NUM) or self._is_token(T_STR) or self._is_keyword_constant():
+        if self._is_const():
             self._advance()
-        elif self._is_token(T_SYM, '('):
+        elif self._is_sym('('):
             self._advance()
             self.compile_expression()
             self._require(T_SYM, ')')
@@ -283,9 +306,9 @@ class Parser(object):
             self.compile_term()
         elif self._is_var_name():
             self._advance()
-            if self._is_token(T_SYM, '['):
+            if self._is_sym('['):
                 self._compile_array_subscript()
-            elif self._is_token(T_SYM, '(') or self._is_token(T_SYM, '.'):
+            elif self._is_sym('(.'):
                 self.compile_subroutine_call()
         self._end_non_terminal()
 
@@ -295,28 +318,23 @@ class Parser(object):
         self._require(T_SYM, ']')
 
     def compile_subroutine_call(self):  # first ID already advanced
-        if self._is_token(T_SYM, '.'):
+        if self._is_sym('.'):
             self._advance()
             self._require(T_ID)
         self._require(T_SYM, '(')
         self.compile_expression_list()
         self._require(T_SYM, ')')
         
-    def _is_keyword_constant(self):
-        tok, kwd = self.lex.peek()
-        return tok == T_KEYWORD and kwd in [KW_TRUE, KW_FALSE, KW_NULL, KW_THIS]
-
     def _is_unary_op(self):
-        return self._is_token(T_SYM, '-') or self._is_token(T_SYM, '~')
+        return self._is_sym('-~')
         
     def _is_op(self):
-        tok, sym = self.lex.peek()
-        return tok == T_SYM and sym in '+-*/&|<>='
+        return self._is_sym('+-*/&|<>=')
     
     def compile_expression_list(self):
         self._start_non_terminal('expressionList')
         self.compile_expression()
-        while self._is_token(T_SYM, ','):
+        while self._is_sym(','):
             self._advance()
             self.compile_expression()
         self._end_non_terminal()

@@ -43,3 +43,10 @@ tokens = ['keyword', 'symbol', 'integerConstant', 'stringConstant', 'identifier'
 
 # Symbols for token type T_SYM
 symbols = '{}()[].,;+-*/&|<>=~'
+
+# Symbol kinds
+SK_STATIC   = 'static'
+SK_FIELD    = 'field'
+SK_ARG      = 'arg'
+SK_VAR      = 'var'
+SK_NONE     = 'none'
