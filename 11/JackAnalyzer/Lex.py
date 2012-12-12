@@ -16,9 +16,6 @@ class Lex(object):
         self._token_type = T_ERROR  # Current token type
         self._cur_val = 0           # Current token value
     
-    def __str__(self):
-        pass
-
     def openout(self, file):
         self._outfile = open(file.replace('.jack', 'T.xml'), 'w')
         self._outfile.write('<tokens>\n')

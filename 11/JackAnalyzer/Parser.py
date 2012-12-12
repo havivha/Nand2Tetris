@@ -1,9 +1,10 @@
 #!/usr/local/bin/python3
 
-import Lex
-from SymbolTable import *
 import os, os.path
 from xml.sax.saxutils import escape
+import Lex
+import SymbolTable
+import VMWriter
 from JackConstant import *
 
 # Parses Jack input.  Tries to give useful error messages.
@@ -15,14 +16,29 @@ class ParserError(Exception):
 class Parser(object):
     def __init__(self, file):
         self.lex = Lex.Lex(file)
-        self.symbols = SymbolTable()
+        self.symbols = SymbolTable.SymbolTable()
+        self.vm = VMWriter.VMWriter(file)
         self.openout(file)
         self.compile_class()
         self.closeout()
         print(self.symbols)
         
-    def __str__(self):
-        pass
+    # Parsing context
+    def cur_class(self):
+        return _cur_class
+        
+    def cur_subroutine(self):
+        return _cur_subroutine
+    
+    # VMWriter support
+    
+    vm_cmds = {'+':'add', '-':'sub', '*':'call os.Multiply', '/':'call os.Divide'}
+    
+    def vm_function_name(self):
+        return self.cur_class()+'.'+self.cur_subroutine()
+        
+    def write_vm_cmd(self, cmd, arg1='', arg2=''):
+        self.vm.write_vm_cmd(cmd, arg1, arg2)
         
     # Routines to advance the token
     def _require(self, tok, val=None):
@@ -63,8 +79,10 @@ class Parser(object):
             pass
         self._outfile = open(file.replace('.jack', '.xml'), 'w')
         self.lex.openout(file)
+        self.vm.openout(file)
     
     def closeout(self):
+        self.vm.closeout()
         self.lex.closeout()
         self._outfile.close()
 
@@ -84,7 +102,7 @@ class Parser(object):
     def compile_class(self):
         self._start_non_terminal('class')
         self._require(T_KEYWORD, KW_CLASS)
-        self._require(T_ID)    # Class names don't have to go into the symbol table
+        self._cur_class = self._require(T_ID)    # Class names don't have to go into the symbol table
         self._require(T_SYM, '{')
         while self._is_class_var_dec():
             self.compile_class_var_dec()
@@ -147,7 +165,7 @@ class Parser(object):
         self._start_non_terminal('subroutineDec')
         kwd = self._advance()
         type = self.compile_void_or_type()
-        name = self.compile_var_name()
+        self._cur_subroutine = self.compile_var_name()
         self.symbols.start_subroutine()
         self._require(T_SYM, '(')
         self.compile_parameter_list()
@@ -280,7 +298,8 @@ class Parser(object):
         self._start_non_terminal('expression')
         self.compile_term()
         while self._is_op():
-            self._advance()
+            op = self._advance()
+            self.write_vm_cmd(self.vm_cmds[op[1]])
             self.compile_term()
         self._end_non_terminal()
         
