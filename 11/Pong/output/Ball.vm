@@ -1,0 +1,405 @@
+function Ball.new 6
+push Ax 0
+pop x 0
+push Ay 0
+pop y 0
+push AleftWall 0
+pop leftWall 0
+push ArightWall 0
+push constant 6
+sub  
+pop rightWall 0
+push AtopWall 0
+pop topWall 0
+push AbottomWall 0
+push constant 6
+sub  
+pop bottomWall 0
+push constant 0
+pop wall 0
+call show 0
+push this 0
+return  
+function Ball.dispose 0
+push Memory 0
+push this 0
+call deAlloc 1
+push constant 0
+return  
+function Ball.show 0
+push Screen 0
+push constant -1
+call setColor 1
+call draw 0
+push constant 0
+return  
+function Ball.hide 0
+push Screen 0
+push constant 0
+call setColor 1
+call draw 0
+push constant 0
+return  
+function Ball.draw 0
+push Screen 0
+push x 0
+push y 0
+push x 0
+push constant 5
+add  
+push y 0
+push constant 5
+add  
+call drawRectangle 4
+push constant 0
+return  
+function Ball.getLeft 0
+push x 0
+return  
+function Ball.getRight 0
+push x 0
+push constant 5
+add  
+return  
+function Ball.setDestination 2
+push destx 0
+push x 0
+sub  
+pop lengthx 0
+push desty 0
+push y 0
+sub  
+pop lengthy 0
+push Math 0
+push Math 0
+push lengthx 0
+call abs 1
+pop dx 0
+push Math 0
+push Math 0
+push lengthy 0
+call abs 1
+pop dy 0
+push dx 0
+push dy 0
+less  
+pop invert 0
+push invert 0
+not  
+goto label2 
+push dx 0
+pop temp 0
+push dy 0
+pop dx 0
+push temp 0
+pop dy 0
+push y 0
+push desty 0
+less  
+pop positivex 0
+push x 0
+push destx 0
+less  
+pop positivey 0
+goto label1 
+label label2 
+push x 0
+push destx 0
+less  
+pop positivex 0
+push y 0
+push desty 0
+less  
+pop positivey 0
+label label1 
+push constant 2
+push dy 0
+call os.Multiply  
+push dx 0
+sub  
+pop d 0
+push constant 2
+push dy 0
+call os.Multiply  
+pop straightD 0
+push constant 2
+push dy 0
+push dx 0
+sub  
+call os.Multiply  
+pop diagonalD 0
+push constant 0
+return  
+function Ball.move 0
+call hide 0
+push d 0
+push constant 0
+less  
+not  
+goto label4 
+push d 0
+push straightD 0
+add  
+pop d 0
+goto label3 
+label label4 
+push d 0
+push diagonalD 0
+add  
+pop d 0
+push positivey 0
+not  
+goto label6 
+push invert 0
+not  
+goto label8 
+push x 0
+push constant 4
+add  
+pop x 0
+goto label7 
+label label8 
+push y 0
+push constant 4
+add  
+pop y 0
+label label7 
+goto label5 
+label label6 
+push invert 0
+not  
+goto label10 
+push x 0
+push constant 4
+sub  
+pop x 0
+goto label9 
+label label10 
+push y 0
+push constant 4
+sub  
+pop y 0
+label label9 
+label label5 
+label label3 
+push positivex 0
+not  
+goto label12 
+push invert 0
+not  
+goto label14 
+push y 0
+push constant 4
+add  
+pop y 0
+goto label13 
+label label14 
+push x 0
+push constant 4
+add  
+pop x 0
+label label13 
+goto label11 
+label label12 
+push invert 0
+not  
+goto label16 
+push y 0
+push constant 4
+sub  
+pop y 0
+goto label15 
+label label16 
+push x 0
+push constant 4
+sub  
+pop x 0
+label label15 
+label label11 
+push x 0
+push leftWall 0
+greater  
+not  
+not  
+goto label18 
+push constant 1
+pop wall 0
+push leftWall 0
+pop x 0
+goto label17 
+label label18 
+label label17 
+push x 0
+push rightWall 0
+less  
+not  
+not  
+goto label20 
+push constant 2
+pop wall 0
+push rightWall 0
+pop x 0
+goto label19 
+label label20 
+label label19 
+push y 0
+push topWall 0
+greater  
+not  
+not  
+goto label22 
+push constant 3
+pop wall 0
+push topWall 0
+pop y 0
+goto label21 
+label label22 
+label label21 
+push y 0
+push bottomWall 0
+less  
+not  
+not  
+goto label24 
+push constant 4
+pop wall 0
+push bottomWall 0
+pop y 0
+goto label23 
+label label24 
+label label23 
+call show 0
+push wall 0
+return  
+function Ball.bounce 1
+push lengthx 0
+push constant 10
+call os.Divide  
+pop divLengthx 0
+push lengthy 0
+push constant 10
+call os.Divide  
+pop divLengthy 0
+push bouncingDirection 0
+push constant 0
+equal  
+not  
+goto label26 
+push constant 10
+pop factor 0
+goto label25 
+label label26 
+push lengthx 0
+push constant 0
+less  
+not  
+push bouncingDirection 0
+push constant 1
+equal  
+and  
+push lengthx 0
+push constant 0
+less  
+or  
+push bouncingDirection 0
+push constant 1
+neg  
+equal  
+and  
+not  
+goto label28 
+push constant 20
+pop factor 0
+goto label27 
+label label28 
+push constant 5
+pop factor 0
+label label27 
+label label25 
+push wall 0
+push constant 1
+equal  
+not  
+goto label30 
+push constant 506
+pop newx 0
+push divLengthy 0
+push constant 50
+neg  
+call os.Multiply  
+push divLengthx 0
+call os.Divide  
+pop newy 0
+push y 0
+push newy 0
+push factor 0
+call os.Multiply  
+add  
+pop newy 0
+goto label29 
+label label30 
+push wall 0
+push constant 2
+equal  
+not  
+goto label32 
+push constant 0
+pop newx 0
+push divLengthy 0
+push constant 50
+call os.Multiply  
+push divLengthx 0
+call os.Divide  
+pop newy 0
+push y 0
+push newy 0
+push factor 0
+call os.Multiply  
+add  
+pop newy 0
+goto label31 
+label label32 
+push wall 0
+push constant 3
+equal  
+not  
+goto label34 
+push constant 250
+pop newy 0
+push divLengthx 0
+push constant 25
+neg  
+call os.Multiply  
+push divLengthy 0
+call os.Divide  
+pop newx 0
+push x 0
+push newx 0
+push factor 0
+call os.Multiply  
+add  
+pop newx 0
+goto label33 
+label label34 
+push constant 0
+pop newy 0
+push divLengthx 0
+push constant 25
+call os.Multiply  
+push divLengthy 0
+call os.Divide  
+pop newx 0
+push x 0
+push newx 0
+push factor 0
+call os.Multiply  
+add  
+pop newx 0
+label label33 
+label label31 
+label label29 
+push newx 0
+push newy 0
+call setDestination 2
+push constant 0
+return  

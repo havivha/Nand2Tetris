@@ -50,4 +50,4 @@ class SymbolTable(object):
         elif name in self.class_symbols:
             return self.class_symbols[name]
         else:
-            return None
+            return (None, None, None)

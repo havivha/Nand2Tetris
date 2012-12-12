@@ -1,0 +1,64 @@
+function Main.main 0
+push Keyboard 0
+push Keyboard 0
+push string How many numbers?
+call readInt 1
+pop length 0
+push Array 0
+push Array 0
+push length 0
+call new 1
+pop a 0
+push constant 0
+pop i 0
+label label1 
+push i 0
+push length 0
+less  
+not  
+goto label2 
+push i 0
+push Keyboard 0
+push Keyboard 0
+push string Enter the next number:
+call readInt 1
+pop a 0
+push i 0
+push constant 1
+add  
+pop i 0
+goto label1 
+label label2 
+push constant 0
+pop i 0
+push constant 0
+pop sum 0
+label label3 
+push i 0
+push length 0
+less  
+not  
+goto label4 
+push sum 0
+push a 0
+push i 0
+add  
+pop sum 0
+push i 0
+push constant 1
+add  
+pop i 0
+goto label3 
+label label4 
+push Output 0
+push string The average is:
+call printString 1
+push Output 0
+push sum 0
+push length 0
+call os.Divide  
+call printInt 1
+push Output 0
+call println 0
+push constant 0
+return  

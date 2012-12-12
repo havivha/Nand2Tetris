@@ -1,0 +1,271 @@
+function PongGame.new 0
+push Screen 0
+call clearScreen 0
+push constant 50
+pop batWidth 0
+push Bat 0
+push Bat 0
+push constant 230
+push constant 229
+push batWidth 0
+push constant 7
+call new 4
+pop bat 0
+push Ball 0
+push Ball 0
+push constant 253
+push constant 222
+push constant 0
+push constant 511
+push constant 0
+push constant 229
+call new 6
+pop ball 0
+push ball 0
+push constant 400
+push constant 0
+call setDestination 2
+push Screen 0
+push constant 0
+push constant 238
+push constant 511
+push constant 240
+call drawRectangle 4
+push Output 0
+push constant 22
+push constant 0
+call moveCursor 2
+push Output 0
+push string Score: 
+call printString 1
+push constant 0
+pop exit 0
+push constant 0
+pop score 0
+push constant 0
+pop wall 0
+push constant 0
+pop lastWall 0
+push this 0
+return  
+function PongGame.dispose 0
+push bat 0
+call dispose 0
+push ball 0
+call dispose 0
+push Memory 0
+push this 0
+call deAlloc 1
+push constant 0
+return  
+function PongGame.newInstance 0
+push PongGame 0
+push PongGame 0
+call new 0
+pop instance 0
+push constant 0
+return  
+function PongGame.getInstance 0
+push instance 0
+return  
+function PongGame.run 0
+label label1 
+push exit 0
+not  
+not  
+goto label2 
+label label3 
+push key 0
+push constant 0
+equal  
+push exit 0
+not  
+and  
+not  
+goto label4 
+push Keyboard 0
+push Keyboard 0
+call keyPressed 0
+pop key 0
+push bat 0
+call move 0
+call moveBall 0
+goto label3 
+label label4 
+push key 0
+push constant 130
+equal  
+not  
+goto label6 
+push bat 0
+push constant 1
+call setDirection 1
+goto label5 
+label label6 
+push key 0
+push constant 132
+equal  
+not  
+goto label8 
+push bat 0
+push constant 2
+call setDirection 1
+goto label7 
+label label8 
+push key 0
+push constant 140
+equal  
+not  
+goto label10 
+push constant -1
+pop exit 0
+goto label9 
+label label10 
+label label9 
+label label7 
+label label5 
+label label11 
+push key 0
+push constant 0
+equal  
+not  
+push exit 0
+not  
+and  
+not  
+goto label12 
+push Keyboard 0
+push Keyboard 0
+call keyPressed 0
+pop key 0
+push bat 0
+call move 0
+call moveBall 0
+goto label11 
+label label12 
+goto label1 
+label label2 
+push exit 0
+not  
+goto label14 
+push Output 0
+push constant 10
+push constant 27
+call moveCursor 2
+push Output 0
+push string Game Ove
+call printString 1
+goto label13 
+label label14 
+label label13 
+push constant 0
+return  
+function PongGame.moveBall 0
+push ball 0
+push ball 0
+call move 0
+pop wall 0
+push wall 0
+push constant 0
+greater  
+push wall 0
+push lastWall 0
+equal  
+not  
+and  
+not  
+goto label16 
+push wall 0
+pop lastWall 0
+push constant 0
+pop bouncingDirection 0
+push bat 0
+push bat 0
+call getLeft 0
+pop batLeft 0
+push bat 0
+push bat 0
+call getRight 0
+pop batRight 0
+push ball 0
+push ball 0
+call getLeft 0
+pop ballLeft 0
+push ball 0
+push ball 0
+call getRight 0
+pop ballRight 0
+push wall 0
+push constant 4
+equal  
+not  
+goto label18 
+push batLeft 0
+push ballRight 0
+greater  
+push batRight 0
+push ballLeft 0
+less  
+or  
+pop exit 0
+push exit 0
+not  
+not  
+goto label20 
+push ballRight 0
+push batLeft 0
+push constant 10
+add  
+less  
+not  
+goto label22 
+push constant 1
+neg  
+pop bouncingDirection 0
+goto label21 
+label label22 
+push ballLeft 0
+push batRight 0
+push constant 10
+sub  
+greater  
+not  
+goto label24 
+push constant 1
+pop bouncingDirection 0
+goto label23 
+label label24 
+label label23 
+label label21 
+push batWidth 0
+push constant 2
+sub  
+pop batWidth 0
+push bat 0
+push batWidth 0
+call setWidth 1
+push score 0
+push constant 1
+add  
+pop score 0
+push Output 0
+push constant 22
+push constant 7
+call moveCursor 2
+push Output 0
+push score 0
+call printInt 1
+goto label19 
+label label20 
+label label19 
+goto label17 
+label label18 
+label label17 
+push ball 0
+push bouncingDirection 0
+call bounce 1
+goto label15 
+label label16 
+label label15 
+push constant 0
+return  

@@ -1,0 +1,115 @@
+function Main.main 0
+push Main 0
+push constant 8001
+push constant 16
+push constant 1
+neg  
+call fillMemory 3
+push Memory 0
+push Memory 0
+push constant 8000
+call peek 1
+pop value 0
+push Main 0
+push value 0
+call convert 1
+push constant 0
+return  
+function Main.convert 1
+push constant -1
+pop loop 0
+label label1 
+push loop 0
+not  
+goto label2 
+push position 0
+push constant 1
+add  
+pop position 0
+push Main 0
+push Main 0
+push mask 0
+call nextMask 1
+pop mask 0
+push Memory 0
+push constant 9000
+push position 0
+add  
+push mask 0
+call poke 2
+push position 0
+push constant 16
+greater  
+not  
+not  
+goto label4 
+push value 0
+push mask 0
+and  
+push constant 0
+equal  
+not  
+not  
+goto label6 
+push Memory 0
+push constant 8000
+push position 0
+add  
+push constant 1
+call poke 2
+goto label5 
+label label6 
+push Memory 0
+push constant 8000
+push position 0
+add  
+push constant 0
+call poke 2
+label label5 
+goto label3 
+label label4 
+push constant 0
+pop loop 0
+label label3 
+goto label1 
+label label2 
+push constant 0
+return  
+function Main.nextMask 1
+push mask 0
+push constant 0
+equal  
+not  
+goto label8 
+push constant 1
+return  
+goto label7 
+label label8 
+push mask 0
+push constant 2
+call os.Multiply  
+return  
+label label7 
+function Main.fillMemory 3
+label label9 
+push length 0
+push constant 0
+greater  
+not  
+goto label10 
+push Memory 0
+push startAddress 0
+push value 0
+call poke 2
+push length 0
+push constant 1
+sub  
+pop length 0
+push startAddress 0
+push constant 1
+add  
+pop startAddress 0
+goto label9 
+label label10 
+push constant 0
+return  

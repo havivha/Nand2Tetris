@@ -1,0 +1,175 @@
+function SquareGame.new 0
+push Square 0
+push Square 0
+push constant 0
+push constant 0
+push constant 30
+call new 3
+pop square 0
+push constant 0
+pop direction 0
+push this 0
+return  
+function SquareGame.dispose 0
+push square 0
+call dispose 0
+push Memory 0
+push this 0
+call deAlloc 1
+push constant 0
+return  
+function SquareGame.run 0
+push constant 0
+pop exit 0
+label label1 
+push exit 0
+not  
+not  
+goto label2 
+label label3 
+push key 0
+push constant 0
+equal  
+not  
+goto label4 
+push Keyboard 0
+push Keyboard 0
+call keyPressed 0
+pop key 0
+call moveSquare 0
+goto label3 
+label label4 
+push key 0
+push constant 81
+equal  
+not  
+goto label6 
+push constant -1
+pop exit 0
+goto label5 
+label label6 
+label label5 
+push key 0
+push constant 90
+equal  
+not  
+goto label8 
+push square 0
+call decSize 0
+goto label7 
+label label8 
+label label7 
+push key 0
+push constant 88
+equal  
+not  
+goto label10 
+push square 0
+call incSize 0
+goto label9 
+label label10 
+label label9 
+push key 0
+push constant 131
+equal  
+not  
+goto label12 
+push constant 1
+pop direction 0
+goto label11 
+label label12 
+label label11 
+push key 0
+push constant 133
+equal  
+not  
+goto label14 
+push constant 2
+pop direction 0
+goto label13 
+label label14 
+label label13 
+push key 0
+push constant 130
+equal  
+not  
+goto label16 
+push constant 3
+pop direction 0
+goto label15 
+label label16 
+label label15 
+push key 0
+push constant 132
+equal  
+not  
+goto label18 
+push constant 4
+pop direction 0
+goto label17 
+label label18 
+label label17 
+label label19 
+push key 0
+push constant 0
+equal  
+not  
+not  
+goto label20 
+push Keyboard 0
+push Keyboard 0
+call keyPressed 0
+pop key 0
+call moveSquare 0
+goto label19 
+label label20 
+goto label1 
+label label2 
+push constant 0
+return  
+function SquareGame.moveSquare 0
+push direction 0
+push constant 1
+equal  
+not  
+goto label22 
+push square 0
+call moveUp 0
+goto label21 
+label label22 
+label label21 
+push direction 0
+push constant 2
+equal  
+not  
+goto label24 
+push square 0
+call moveDown 0
+goto label23 
+label label24 
+label label23 
+push direction 0
+push constant 3
+equal  
+not  
+goto label26 
+push square 0
+call moveLeft 0
+goto label25 
+label label26 
+label label25 
+push direction 0
+push constant 4
+equal  
+not  
+goto label28 
+push square 0
+call moveRight 0
+goto label27 
+label label28 
+label label27 
+push Sys 0
+push constant 5
+call wait 1
+push constant 0
+return  

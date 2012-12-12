@@ -1,0 +1,13 @@
+function Main.main 0
+push PongGame 0
+call newInstance 0
+push PongGame 0
+push PongGame 0
+call getInstance 0
+pop game 0
+push game 0
+call run 0
+push game 0
+call dispose 0
+push constant 0
+return  

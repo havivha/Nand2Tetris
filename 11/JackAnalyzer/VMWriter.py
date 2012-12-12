@@ -7,7 +7,7 @@ import os, os.path
 class VMWriter(object):
     def __init__(self, file):
         self.openout(file)
-    
+        
     def openout(self, file):
         self._outfile = open(file.replace('.jack', '.vm'), 'w')
     

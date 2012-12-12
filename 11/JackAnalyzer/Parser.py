@@ -18,6 +18,7 @@ class Parser(object):
         self.lex = Lex.Lex(file)
         self.symbols = SymbolTable.SymbolTable()
         self.vm = VMWriter.VMWriter(file)
+        self.label_num = 0
         self.openout(file)
         self.compile_class()
         self.closeout()
@@ -25,21 +26,25 @@ class Parser(object):
         
     # Parsing context
     def cur_class(self):
-        return _cur_class
+        return self._cur_class
         
     def cur_subroutine(self):
-        return _cur_subroutine
+        return self._cur_subroutine
     
     # VMWriter support
     
-    vm_cmds = {'+':'add', '-':'sub', '*':'call os.Multiply', '/':'call os.Divide'}
+    # TO FIX:
+    vm_cmds = {'+':'add', '-':'sub', '*':'call os.Multiply', '/':'call os.Divide',
+               '<':'less', '>':'greater', '=':'equal', '&':'and', '|':'or'}
+    vm_unary_cmds = {'-':'neg', '~':'not'}
+    segments = {SK_STATIC:'static', SK_FIELD:'static', SK_ARG:'argument', SK_VAR:'local'}
     
     def vm_function_name(self):
         return self.cur_class()+'.'+self.cur_subroutine()
         
     def write_vm_cmd(self, cmd, arg1='', arg2=''):
         self.vm.write_vm_cmd(cmd, arg1, arg2)
-        
+
     # Routines to advance the token
     def _require(self, tok, val=None):
         lextok, lexval = self._advance()
@@ -168,18 +173,24 @@ class Parser(object):
         self._cur_subroutine = self.compile_var_name()
         self.symbols.start_subroutine()
         self._require(T_SYM, '(')
-        self.compile_parameter_list()
+        num_args = self.compile_parameter_list()
         self._require(T_SYM, ')')
+        self.vm.write_function(self.vm_function_name(), num_args)
         self.compile_subroutine_body()
         self._end_non_terminal()
                 
     def compile_parameter_list(self):
         self._start_non_terminal('parameterList')
-        self.compile_parameter()
-        while self._is_sym(','):
-            self._advance()
+        num_args = 0
+        if self._is_type():
             self.compile_parameter()
+            num_args = 1
+            while self._is_sym(','):
+                self._advance()
+                self.compile_parameter()
+                num_args += 1
         self._end_non_terminal()
+        return num_args
               
     def compile_parameter(self):
         if self._is_type():
@@ -228,8 +239,8 @@ class Parser(object):
     def compile_do(self):
         self._start_non_terminal('doStatement')
         self._require(T_KEYWORD, KW_DO)
-        self._require(T_ID)
-        self.compile_subroutine_call()
+        name = self._require(T_ID)
+        self.compile_subroutine_call(name)  # VM code for subroutine call
         self._require(T_SYM, ';')
         self._end_non_terminal()
         
@@ -239,7 +250,7 @@ class Parser(object):
     def compile_let(self):
         self._start_non_terminal('letStatement')
         self._require(T_KEYWORD, KW_LET)
-        self.compile_var_name()
+        name = self.compile_var_name()
         if self._is_sym('['):
             self._advance()
             self.compile_expression()
@@ -247,6 +258,7 @@ class Parser(object):
         self._require(T_SYM, '=')
         self.compile_expression()
         self._require(T_SYM, ';')
+        self.vm.write_pop(name, 0)      # FIX THIS
         self._end_non_terminal()
         
     def _is_while(self):
@@ -255,8 +267,14 @@ class Parser(object):
     def compile_while(self):
         self._start_non_terminal('whileStatement')
         self._require(T_KEYWORD, KW_WHILE)
-        self._compile_cond_expression_statements()
+        top_label = self.new_label()
+        self.vm.write_label(top_label)          # label top_label
+        self._compile_cond_expression_statements(top_label) # VM code for condition and while statements
         self._end_non_terminal()
+        
+    def new_label(self):
+        self.label_num += 1
+        return 'label'+str(self.label_num)
         
     def _is_return(self):
         return self._is_keyword(KW_RETURN)
@@ -265,8 +283,11 @@ class Parser(object):
         self._start_non_terminal('returnStatement')
         self._require(T_KEYWORD, KW_RETURN)
         if not self._is_sym(';'):
-            self.compile_expression()
+            self.compile_expression()   # VM code for return expression if any
+        else:
+            self.vm.write_push('constant', 0) # push 0 if not returning a value
         self._require(T_SYM, ';')
+        self.vm.write_return()          # return
         self._end_non_terminal()
         
     def _is_if(self):
@@ -275,32 +296,38 @@ class Parser(object):
     def compile_if(self):
         self._start_non_terminal('ifStatement')
         self._require(T_KEYWORD, KW_IF)
-        self._compile_cond_expression_statements()
+        end_label = self.new_label()
+        self._compile_cond_expression_statements(end_label) # VM code for condition and if statements
         if self._is_keyword(KW_ELSE):
             self._advance()
             self._require(T_SYM, '{')
-            self.compile_statements()
+            self.compile_statements()   # VM code for else statements
             self._require(T_SYM, "}")
+        self.vm.write_label(end_label)  # label end_label
         self._end_non_terminal()
 
-    def _compile_cond_expression_statements(self):
+    def _compile_cond_expression_statements(self, label):
         self._require(T_SYM, '(')
         self.compile_expression()
         self._require(T_SYM, ')')
+        self.vm.write_vm_cmd('not')     # ~(cond)
+        notif_label = self.new_label()
+        self.vm.write_goto(notif_label) # if-goto notif_label
         self._require(T_SYM, '{')
-        self.compile_statements()
+        self.compile_statements()       # VM code for if statements
         self._require(T_SYM, '}')
+        self.vm.write_goto(label)       # goto label
+        self.vm.write_label(notif_label)# label notif_label
 
     # Expressions
     def compile_expression(self):
-        if not self._is_term():
-            return
         self._start_non_terminal('expression')
         self.compile_term()
+        # Doesn't handle normal order of operations - just left to right for now
         while self._is_op():
             op = self._advance()
-            self.write_vm_cmd(self.vm_cmds[op[1]])
             self.compile_term()
+            self.write_vm_cmd(self.vm_cmds[op[1]])  # op
         self._end_non_terminal()
         
     def _is_term(self):
@@ -315,34 +342,54 @@ class Parser(object):
     def compile_term(self):
         self._start_non_terminal('term')
         if self._is_const():
-            self._advance()
+            self.push_const()
         elif self._is_sym('('):
             self._advance()
-            self.compile_expression()
+            self.compile_expression()               # VM code to evaluate expression
             self._require(T_SYM, ')')
         elif self._is_unary_op():
-            self._advance()
+            tok, op = self._advance()
             self.compile_term()
+            self.write_vm_cmd(self.vm_unary_cmds[op])    # op
         elif self._is_var_name():
-            self._advance()
+            tok, name = self._advance()
+            self.vm.write_push(name, 0)             # FIX THIS
             if self._is_sym('['):
-                self._compile_array_subscript()
+                self._compile_array_subscript(name) # VM code for array subscript
             elif self._is_sym('(.'):
-                self.compile_subroutine_call()
+                self.compile_subroutine_call(name)  # VM code for subroutine call
         self._end_non_terminal()
 
-    def _compile_array_subscript(self):
+    def push_const(self):
+        tok, val = self._advance()
+        if tok == T_NUM:
+            self.vm.write_push('constant', val)     # push constant val
+        elif tok == T_STR:
+            self.vm.write_push('string', val)       # FIX THIS
+        elif tok == T_KEYWORD:
+            self.push_kwd_const(val)
+            
+    def push_kwd_const(self, kwd):
+        if kwd == KW_THIS:
+            self.vm.write_push('this', 0)       # FIX THIS
+        else:
+            kwd_const_val = {KW_TRUE:-1, KW_FALSE:0, KW_NULL:0}
+            self.vm.write_push('constant', kwd_const_val[kwd])
+    
+    def _compile_array_subscript(self, name):
         self._require(T_SYM, '[')
         self.compile_expression()
         self._require(T_SYM, ']')
 
-    def compile_subroutine_call(self):  # first ID already advanced
+    def compile_subroutine_call(self, name):
         if self._is_sym('.'):
+            self.vm.write_push(name, 0)  # push name - FIX THIS
             self._advance()
-            self._require(T_ID)
+            name = self._require(T_ID)
         self._require(T_SYM, '(')
-        self.compile_expression_list()
+        num_args = self.compile_expr_list() # VM code to push arguments
         self._require(T_SYM, ')')
+        self.vm.write_call(name, num_args)  # call name num_args
         
     def _is_unary_op(self):
         return self._is_sym('-~')
@@ -350,10 +397,15 @@ class Parser(object):
     def _is_op(self):
         return self._is_sym('+-*/&|<>=')
     
-    def compile_expression_list(self):
+    def compile_expr_list(self):
+        num_args = 0
         self._start_non_terminal('expressionList')
-        self.compile_expression()
-        while self._is_sym(','):
-            self._advance()
+        if self._is_term():
             self.compile_expression()
+            num_args = 1
+            while self._is_sym(','):
+                self._advance()
+                self.compile_expression()
+                num_args += 1
         self._end_non_terminal()
+        return num_args

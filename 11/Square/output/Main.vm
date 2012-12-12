@@ -1,0 +1,11 @@
+function Main.main 0
+push SquareGame 0
+push SquareGame 0
+call new 0
+pop game 0
+push game 0
+call run 0
+push game 0
+call dispose 0
+push constant 0
+return  
