@@ -1,272 +1,308 @@
-function Square.new 3
-push Ax 0
-pop x 0
-push Ay 0
-pop y 0
-push Asize 0
-pop size 0
-call draw 0
+function Square.new 0
+push constant 3
+call Memory.alloc 1
+pop pointer 0
+push argument 0
+pop this 0
+push argument 1
+pop this 1
+push argument 2
+pop this 2
+push pointer 0
+call Square.draw 1
+pop temp 0
 push this 0
 return  
 function Square.dispose 0
-push Memory 0
+push argument 0
+pop pointer 0
 push this 0
-call deAlloc 1
+call Memory.deAlloc 1
+pop temp 0
 push constant 0
 return  
 function Square.draw 0
-push Screen 0
-push constant -1
-call setColor 1
-push Screen 0
-push x 0
-push y 0
-push x 0
-push size 0
+push argument 0
+pop pointer 0
+push constant 1
+neg  
+call Screen.setColor 1
+pop temp 0
+push this 0
+push this 1
+push this 0
+push this 2
 add  
-push y 0
-push size 0
+push this 1
+push this 2
 add  
-call drawRectangle 4
+call Screen.drawRectangle 4
+pop temp 0
 push constant 0
 return  
 function Square.erase 0
-push Screen 0
+push argument 0
+pop pointer 0
 push constant 0
-call setColor 1
-push Screen 0
-push x 0
-push y 0
-push x 0
-push size 0
+call Screen.setColor 1
+pop temp 0
+push this 0
+push this 1
+push this 0
+push this 2
 add  
-push y 0
-push size 0
+push this 1
+push this 2
 add  
-call drawRectangle 4
+call Screen.drawRectangle 4
+pop temp 0
 push constant 0
 return  
 function Square.incSize 0
-push y 0
-push size 0
+push argument 0
+pop pointer 0
+push this 1
+push this 2
 add  
 push constant 254
-less  
-push x 0
-push size 0
+lt  
+push this 0
+push this 2
 add  
 push constant 510
-less  
+lt  
 and  
 not  
-goto label2 
-call erase 0
-push size 0
+if-goto label2 
+push pointer 0
+call Square.erase 1
+pop temp 0
+push this 2
 push constant 2
 add  
-pop size 0
-call draw 0
+pop this 2
+push pointer 0
+call Square.draw 1
+pop temp 0
 goto label1 
 label label2 
 label label1 
 push constant 0
 return  
 function Square.decSize 0
-push size 0
+push argument 0
+pop pointer 0
+push this 2
 push constant 2
-greater  
+gt  
 not  
-goto label4 
-call erase 0
-push size 0
+if-goto label4 
+push pointer 0
+call Square.erase 1
+pop temp 0
+push this 2
 push constant 2
 sub  
-pop size 0
-call draw 0
+pop this 2
+push pointer 0
+call Square.draw 1
+pop temp 0
 goto label3 
 label label4 
 label label3 
 push constant 0
 return  
 function Square.moveUp 0
-push y 0
+push argument 0
+pop pointer 0
+push this 1
 push constant 1
-greater  
+gt  
 not  
-goto label6 
-push Screen 0
+if-goto label6 
 push constant 0
-call setColor 1
-push Screen 0
-push x 0
-push y 0
-push size 0
+call Screen.setColor 1
+pop temp 0
+push this 0
+push this 1
+push this 2
 add  
 push constant 1
 sub  
-push x 0
-push size 0
+push this 0
+push this 2
 add  
-push y 0
-push size 0
+push this 1
+push this 2
 add  
-call drawRectangle 4
-push y 0
+call Screen.drawRectangle 4
+pop temp 0
+push this 1
 push constant 2
 sub  
-pop y 0
-push Screen 0
-push constant -1
-call setColor 1
-push Screen 0
-push x 0
-push y 0
-push x 0
-push size 0
+pop this 1
+push constant 1
+neg  
+call Screen.setColor 1
+pop temp 0
+push this 0
+push this 1
+push this 0
+push this 2
 add  
-push y 0
+push this 1
 push constant 1
 add  
-call drawRectangle 4
+call Screen.drawRectangle 4
+pop temp 0
 goto label5 
 label label6 
 label label5 
 push constant 0
 return  
 function Square.moveDown 0
-push y 0
-push size 0
+push argument 0
+pop pointer 0
+push this 1
+push this 2
 add  
 push constant 254
-less  
+lt  
 not  
-goto label8 
-push Screen 0
+if-goto label8 
 push constant 0
-call setColor 1
-push Screen 0
-push x 0
-push y 0
-push x 0
-push size 0
+call Screen.setColor 1
+pop temp 0
+push this 0
+push this 1
+push this 0
+push this 2
 add  
-push y 0
+push this 1
 push constant 1
 add  
-call drawRectangle 4
-push y 0
+call Screen.drawRectangle 4
+pop temp 0
+push this 1
 push constant 2
 add  
-pop y 0
-push Screen 0
-push constant -1
-call setColor 1
-push Screen 0
-push x 0
-push y 0
-push size 0
+pop this 1
+push constant 1
+neg  
+call Screen.setColor 1
+pop temp 0
+push this 0
+push this 1
+push this 2
 add  
 push constant 1
 sub  
-push x 0
-push size 0
+push this 0
+push this 2
 add  
-push y 0
-push size 0
+push this 1
+push this 2
 add  
-call drawRectangle 4
+call Screen.drawRectangle 4
+pop temp 0
 goto label7 
 label label8 
 label label7 
 push constant 0
 return  
 function Square.moveLeft 0
-push x 0
+push argument 0
+pop pointer 0
+push this 0
 push constant 1
-greater  
+gt  
 not  
-goto label10 
-push Screen 0
+if-goto label10 
 push constant 0
-call setColor 1
-push Screen 0
-push x 0
-push size 0
+call Screen.setColor 1
+pop temp 0
+push this 0
+push this 2
 add  
 push constant 1
 sub  
-push y 0
-push x 0
-push size 0
+push this 1
+push this 0
+push this 2
 add  
-push y 0
-push size 0
+push this 1
+push this 2
 add  
-call drawRectangle 4
-push x 0
+call Screen.drawRectangle 4
+pop temp 0
+push this 0
 push constant 2
 sub  
-pop x 0
-push Screen 0
-push constant -1
-call setColor 1
-push Screen 0
-push x 0
-push y 0
-push x 0
+pop this 0
+push constant 1
+neg  
+call Screen.setColor 1
+pop temp 0
+push this 0
+push this 1
+push this 0
 push constant 1
 add  
-push y 0
-push size 0
+push this 1
+push this 2
 add  
-call drawRectangle 4
+call Screen.drawRectangle 4
+pop temp 0
 goto label9 
 label label10 
 label label9 
 push constant 0
 return  
 function Square.moveRight 0
-push x 0
-push size 0
+push argument 0
+pop pointer 0
+push this 0
+push this 2
 add  
 push constant 510
-less  
+lt  
 not  
-goto label12 
-push Screen 0
+if-goto label12 
 push constant 0
-call setColor 1
-push Screen 0
-push x 0
-push y 0
-push x 0
+call Screen.setColor 1
+pop temp 0
+push this 0
+push this 1
+push this 0
 push constant 1
 add  
-push y 0
-push size 0
+push this 1
+push this 2
 add  
-call drawRectangle 4
-push x 0
+call Screen.drawRectangle 4
+pop temp 0
+push this 0
 push constant 2
 add  
-pop x 0
-push Screen 0
-push constant -1
-call setColor 1
-push Screen 0
-push x 0
-push size 0
+pop this 0
+push constant 1
+neg  
+call Screen.setColor 1
+pop temp 0
+push this 0
+push this 2
 add  
 push constant 1
 sub  
-push y 0
-push x 0
-push size 0
+push this 1
+push this 0
+push this 2
 add  
-push y 0
-push size 0
+push this 1
+push this 2
 add  
-call drawRectangle 4
+call Screen.drawRectangle 4
+pop temp 0
 goto label11 
 label label12 
 label label11 

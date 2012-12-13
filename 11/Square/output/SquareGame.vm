@@ -1,126 +1,135 @@
 function SquareGame.new 0
-push Square 0
-push Square 0
+push constant 2
+call Memory.alloc 1
+pop pointer 0
 push constant 0
 push constant 0
 push constant 30
-call new 3
-pop square 0
+call Square.new 3
+pop this 0
 push constant 0
-pop direction 0
+pop this 1
 push this 0
 return  
 function SquareGame.dispose 0
-push square 0
-call dispose 0
-push Memory 0
+push argument 0
+pop pointer 0
 push this 0
-call deAlloc 1
+call Square.dispose 1
+pop temp 0
+push this 0
+call Memory.deAlloc 1
+pop temp 0
 push constant 0
 return  
-function SquareGame.run 0
+function SquareGame.run 2
+push argument 0
+pop pointer 0
 push constant 0
-pop exit 0
+pop local 1
 label label1 
-push exit 0
+push local 1
 not  
 not  
-goto label2 
+if-goto label2 
 label label3 
-push key 0
+push local 0
 push constant 0
-equal  
+eq  
 not  
-goto label4 
-push Keyboard 0
-push Keyboard 0
-call keyPressed 0
-pop key 0
-call moveSquare 0
+if-goto label4 
+call Keyboard.keyPressed 0
+pop local 0
+push pointer 0
+call SquareGame.moveSquare 1
+pop temp 0
 goto label3 
 label label4 
-push key 0
+push local 0
 push constant 81
-equal  
+eq  
 not  
-goto label6 
-push constant -1
-pop exit 0
+if-goto label6 
+push constant 1
+neg  
+pop local 1
 goto label5 
 label label6 
 label label5 
-push key 0
+push local 0
 push constant 90
-equal  
+eq  
 not  
-goto label8 
-push square 0
-call decSize 0
+if-goto label8 
+push this 0
+call Square.decSize 1
+pop temp 0
 goto label7 
 label label8 
 label label7 
-push key 0
+push local 0
 push constant 88
-equal  
+eq  
 not  
-goto label10 
-push square 0
-call incSize 0
+if-goto label10 
+push this 0
+call Square.incSize 1
+pop temp 0
 goto label9 
 label label10 
 label label9 
-push key 0
+push local 0
 push constant 131
-equal  
+eq  
 not  
-goto label12 
+if-goto label12 
 push constant 1
-pop direction 0
+pop this 1
 goto label11 
 label label12 
 label label11 
-push key 0
+push local 0
 push constant 133
-equal  
+eq  
 not  
-goto label14 
+if-goto label14 
 push constant 2
-pop direction 0
+pop this 1
 goto label13 
 label label14 
 label label13 
-push key 0
+push local 0
 push constant 130
-equal  
+eq  
 not  
-goto label16 
+if-goto label16 
 push constant 3
-pop direction 0
+pop this 1
 goto label15 
 label label16 
 label label15 
-push key 0
+push local 0
 push constant 132
-equal  
+eq  
 not  
-goto label18 
+if-goto label18 
 push constant 4
-pop direction 0
+pop this 1
 goto label17 
 label label18 
 label label17 
 label label19 
-push key 0
+push local 0
 push constant 0
-equal  
+eq  
 not  
 not  
-goto label20 
-push Keyboard 0
-push Keyboard 0
-call keyPressed 0
-pop key 0
-call moveSquare 0
+if-goto label20 
+call Keyboard.keyPressed 0
+pop local 0
+push pointer 0
+call SquareGame.moveSquare 1
+pop temp 0
 goto label19 
 label label20 
 goto label1 
@@ -128,48 +137,54 @@ label label2
 push constant 0
 return  
 function SquareGame.moveSquare 0
-push direction 0
+push argument 0
+pop pointer 0
+push this 1
 push constant 1
-equal  
+eq  
 not  
-goto label22 
-push square 0
-call moveUp 0
+if-goto label22 
+push this 0
+call Square.moveUp 1
+pop temp 0
 goto label21 
 label label22 
 label label21 
-push direction 0
+push this 1
 push constant 2
-equal  
+eq  
 not  
-goto label24 
-push square 0
-call moveDown 0
+if-goto label24 
+push this 0
+call Square.moveDown 1
+pop temp 0
 goto label23 
 label label24 
 label label23 
-push direction 0
+push this 1
 push constant 3
-equal  
+eq  
 not  
-goto label26 
-push square 0
-call moveLeft 0
+if-goto label26 
+push this 0
+call Square.moveLeft 1
+pop temp 0
 goto label25 
 label label26 
 label label25 
-push direction 0
+push this 1
 push constant 4
-equal  
+eq  
 not  
-goto label28 
-push square 0
-call moveRight 0
+if-goto label28 
+push this 0
+call Square.moveRight 1
+pop temp 0
 goto label27 
 label label28 
 label label27 
-push Sys 0
 push constant 5
-call wait 1
+call Sys.wait 1
+pop temp 0
 push constant 0
 return  

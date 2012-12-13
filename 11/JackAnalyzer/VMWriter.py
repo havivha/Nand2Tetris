@@ -5,8 +5,8 @@ import os, os.path
 # VM code generator
 
 class VMWriter(object):
-    def __init__(self, file):
-        self.openout(file)
+    def __init__(self,):
+        pass
         
     def openout(self, file):
         self._outfile = open(file.replace('.jack', '.vm'), 'w')
@@ -15,6 +15,8 @@ class VMWriter(object):
         self._outfile.close()
 
     def write_push(self, segment, index):
+        if segment==None:
+            Exception()
         self.write_vm_cmd('push', segment, index)
         
     def write_pop(self, segment, index):

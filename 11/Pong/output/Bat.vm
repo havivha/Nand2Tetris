@@ -1,174 +1,208 @@
-function Bat.new 4
-push Ax 0
-pop x 0
-push Ay 0
-pop y 0
-push Awidth 0
-pop width 0
-push Aheight 0
-pop height 0
+function Bat.new 0
+push constant 5
+call Memory.alloc 1
+pop pointer 0
+push argument 0
+pop this 0
+push argument 1
+pop this 1
+push argument 2
+pop this 2
+push argument 3
+pop this 3
 push constant 2
-pop direction 0
-call show 0
+pop this 4
+push pointer 0
+call Bat.show 1
+pop temp 0
 push this 0
 return  
 function Bat.dispose 0
-push Memory 0
+push argument 0
+pop pointer 0
 push this 0
-call deAlloc 1
+call Memory.deAlloc 1
+pop temp 0
 push constant 0
 return  
 function Bat.show 0
-push Screen 0
-push constant -1
-call setColor 1
-call draw 0
+push argument 0
+pop pointer 0
+push constant 1
+neg  
+call Screen.setColor 1
+pop temp 0
+push pointer 0
+call Bat.draw 1
+pop temp 0
 push constant 0
 return  
 function Bat.hide 0
-push Screen 0
+push argument 0
+pop pointer 0
 push constant 0
-call setColor 1
-call draw 0
+call Screen.setColor 1
+pop temp 0
+push pointer 0
+call Bat.draw 1
+pop temp 0
 push constant 0
 return  
 function Bat.draw 0
-push Screen 0
-push x 0
-push y 0
-push x 0
-push width 0
+push argument 0
+pop pointer 0
+push this 0
+push this 1
+push this 0
+push this 2
 add  
-push y 0
-push height 0
+push this 1
+push this 3
 add  
-call drawRectangle 4
+call Screen.drawRectangle 4
+pop temp 0
 push constant 0
 return  
-function Bat.setDirection 1
-push Adirection 0
-pop direction 0
+function Bat.setDirection 0
+push argument 0
+pop pointer 0
+push argument 0
+pop this 4
 push constant 0
 return  
 function Bat.getLeft 0
-push x 0
+push argument 0
+pop pointer 0
+push this 0
 return  
 function Bat.getRight 0
-push x 0
-push width 0
+push argument 0
+pop pointer 0
+push this 0
+push this 2
 add  
 return  
-function Bat.setWidth 1
-call hide 0
-push Awidth 0
-pop width 0
-call show 0
+function Bat.setWidth 0
+push argument 0
+pop pointer 0
+push pointer 0
+call Bat.hide 1
+pop temp 0
+push argument 0
+pop this 2
+push pointer 0
+call Bat.show 1
+pop temp 0
 push constant 0
 return  
 function Bat.move 0
-push direction 0
+push argument 0
+pop pointer 0
+push this 4
 push constant 1
-equal  
+eq  
 not  
-goto label2 
-push x 0
+if-goto label2 
+push this 0
 push constant 4
 sub  
-pop x 0
-push x 0
+pop this 0
+push this 0
 push constant 0
-less  
+lt  
 not  
-goto label4 
+if-goto label4 
 push constant 0
-pop x 0
+pop this 0
 goto label3 
 label label4 
 label label3 
-push Screen 0
 push constant 0
-call setColor 1
-push Screen 0
-push x 0
-push width 0
+call Screen.setColor 1
+pop temp 0
+push this 0
+push this 2
 add  
 push constant 1
 add  
-push y 0
-push x 0
-push width 0
+push this 1
+push this 0
+push this 2
 add  
 push constant 4
 add  
-push y 0
-push height 0
+push this 1
+push this 3
 add  
-call drawRectangle 4
-push Screen 0
-push constant -1
-call setColor 1
-push Screen 0
-push x 0
-push y 0
-push x 0
+call Screen.drawRectangle 4
+pop temp 0
+push constant 1
+neg  
+call Screen.setColor 1
+pop temp 0
+push this 0
+push this 1
+push this 0
 push constant 3
 add  
-push y 0
-push height 0
+push this 1
+push this 3
 add  
-call drawRectangle 4
+call Screen.drawRectangle 4
+pop temp 0
 goto label1 
 label label2 
-push x 0
+push this 0
 push constant 4
 add  
-pop x 0
-push x 0
-push width 0
+pop this 0
+push this 0
+push this 2
 add  
 push constant 511
-greater  
+gt  
 not  
-goto label6 
+if-goto label6 
 push constant 511
-push width 0
+push this 2
 sub  
-pop x 0
+pop this 0
 goto label5 
 label label6 
 label label5 
-push Screen 0
 push constant 0
-call setColor 1
-push Screen 0
-push x 0
+call Screen.setColor 1
+pop temp 0
+push this 0
 push constant 4
 sub  
-push y 0
-push x 0
+push this 1
+push this 0
 push constant 1
 sub  
-push y 0
-push height 0
+push this 1
+push this 3
 add  
-call drawRectangle 4
-push Screen 0
-push constant -1
-call setColor 1
-push Screen 0
-push x 0
-push width 0
+call Screen.drawRectangle 4
+pop temp 0
+push constant 1
+neg  
+call Screen.setColor 1
+pop temp 0
+push this 0
+push this 2
 add  
 push constant 3
 sub  
-push y 0
-push x 0
-push width 0
+push this 1
+push this 0
+push this 2
 add  
-push y 0
-push height 0
+push this 1
+push this 3
 add  
-call drawRectangle 4
+call Screen.drawRectangle 4
+pop temp 0
 label label1 
 push constant 0
 return  

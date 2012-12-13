@@ -1,0 +1,7 @@
+function Main.main 0
+push constant 8000
+push constant 5
+call Memory.poke 2
+pop temp 0
+push constant 0
+return  

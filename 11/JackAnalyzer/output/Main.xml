@@ -12,30 +12,33 @@
 <symbol> ) </symbol>
 <subroutineBody>
 <symbol> { </symbol>
-<varDec>
-<keyword> var </keyword>
-<identifier> Array </identifier>
-<identifier> a </identifier>
-<symbol> ; </symbol>
-</varDec>
 <statements>
-<letStatement>
-<keyword> let </keyword>
-<identifier> a </identifier>
-<symbol> = </symbol>
-<expression>
-<term>
-<identifier> Main </identifier>
+<doStatement>
+<keyword> do </keyword>
+<identifier> Memory </identifier>
 <symbol> . </symbol>
-<identifier> double </identifier>
+<identifier> poke </identifier>
 <symbol> ( </symbol>
 <expressionList>
-</expressionList>
-<symbol> ) </symbol>
+<expression>
+<term>
+<integerConstant> 8000 </integerConstant>
 </term>
 </expression>
+<symbol> , </symbol>
+<expression>
+<term>
+<integerConstant> 5 </integerConstant>
+</term>
+</expression>
+</expressionList>
+<symbol> ) </symbol>
 <symbol> ; </symbol>
-</letStatement>
+</doStatement>
+<returnStatement>
+<keyword> return </keyword>
+<symbol> ; </symbol>
+</returnStatement>
 </statements>
 <symbol> } </symbol>
 </subroutineBody>

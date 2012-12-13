@@ -29,8 +29,8 @@ class SymbolTable(object):
         self.symbols[kind][name] = (type, kind, self.index[kind])
         self.index[kind] += 1
 
-    def var_count(kind):
-        return sum(1 for (t, k, i) in self.symbols[kind] if k == kind)
+    def var_count(self, kind):
+        return sum(1 for n, (t, k, i) in self.symbols[kind].items() if k == kind)
         
     def type_of(self, name):
         (type, kind, index) = self.lookup(name)

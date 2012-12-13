@@ -1,0 +1,8 @@
+class Main {
+    function void main() {
+        
+        do Memory.poke(8000,5);
+    
+    	return;
+    }
+}

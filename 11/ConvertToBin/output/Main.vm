@@ -1,114 +1,111 @@
-function Main.main 0
-push Main 0
+function Main.main 2
 push constant 8001
 push constant 16
 push constant 1
 neg  
-call fillMemory 3
-push Memory 0
-push Memory 0
+call Main.fillMemory 3
+pop temp 0
 push constant 8000
-call peek 1
-pop value 0
-push Main 0
-push value 0
-call convert 1
+call Memory.peek 1
+pop local 1
+push local 1
+call Main.convert 1
+pop temp 0
 push constant 0
 return  
-function Main.convert 1
-push constant -1
-pop loop 0
+function Main.convert 3
+push constant 1
+neg  
+pop local 2
 label label1 
-push loop 0
+push local 2
 not  
-goto label2 
-push position 0
+if-goto label2 
+push local 1
 push constant 1
 add  
-pop position 0
-push Main 0
-push Main 0
-push mask 0
-call nextMask 1
-pop mask 0
-push Memory 0
+pop local 1
+push local 0
+call Main.nextMask 1
+pop local 0
 push constant 9000
-push position 0
+push local 1
 add  
-push mask 0
-call poke 2
-push position 0
+push local 0
+call Memory.poke 2
+pop temp 0
+push local 1
 push constant 16
-greater  
+gt  
 not  
 not  
-goto label4 
-push value 0
-push mask 0
+if-goto label4 
+push argument 0
+push local 0
 and  
 push constant 0
-equal  
+eq  
 not  
 not  
-goto label6 
-push Memory 0
+if-goto label6 
 push constant 8000
-push position 0
+push local 1
 add  
 push constant 1
-call poke 2
+call Memory.poke 2
+pop temp 0
 goto label5 
 label label6 
-push Memory 0
 push constant 8000
-push position 0
+push local 1
 add  
 push constant 0
-call poke 2
+call Memory.poke 2
+pop temp 0
 label label5 
 goto label3 
 label label4 
 push constant 0
-pop loop 0
+pop local 2
 label label3 
 goto label1 
 label label2 
 push constant 0
 return  
-function Main.nextMask 1
-push mask 0
+function Main.nextMask 0
+push argument 0
 push constant 0
-equal  
+eq  
 not  
-goto label8 
+if-goto label8 
 push constant 1
 return  
 goto label7 
 label label8 
-push mask 0
+push argument 0
 push constant 2
-call os.Multiply  
+call Math.multiply 2  
 return  
 label label7 
-function Main.fillMemory 3
+function Main.fillMemory 0
 label label9 
-push length 0
+push argument 1
 push constant 0
-greater  
+gt  
 not  
-goto label10 
-push Memory 0
-push startAddress 0
-push value 0
-call poke 2
-push length 0
+if-goto label10 
+push argument 0
+push argument 2
+call Memory.poke 2
+pop temp 0
+push argument 1
 push constant 1
 sub  
-pop length 0
-push startAddress 0
+pop argument 1
+push argument 0
 push constant 1
 add  
-pop startAddress 0
+pop argument 0
 goto label9 
 label label10 
 push constant 0

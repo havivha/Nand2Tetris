@@ -1,28 +1,28 @@
 #!/usr/local/bin/python3
 
 import sys, os, os.path, glob
-import Parser
+from Parser import *
 
 class JackAnalyzer(object):
     def __init__(self):
         pass
 
-    def analyze(self, infiles, outfile):
+    def analyze(self, infiles):
         for infile in infiles:
-            Parser.Parser(infile)
+            Parser(infile)
 
 def main():
     if len(sys.argv) != 2:
         print( "Usage: JackAnalyzer [file.jack|dir]" )
     else:
-        infiles, outfile = get_files( sys.argv[1] )
+        infiles = get_files( sys.argv[1] )
         analyzer = JackAnalyzer()
-        analyzer.analyze(infiles, outfile)
+        analyzer.analyze(infiles)
 
 def get_files( file_or_dir ):
     if file_or_dir.endswith('.jack'):
-        return [file_or_dir], file_or_dir.replace('.jack', '.xml')
+        return [file_or_dir]
     else:
-        return glob.glob(file_or_dir+'/*.jack'), file_or_dir+'/'+file_or_dir+'.xml'
+        return glob.glob(file_or_dir+'/*.jack')
 
 main()

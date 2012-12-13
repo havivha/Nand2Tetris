@@ -2,12 +2,12 @@
 
 import os, os.path
 from xml.sax.saxutils import escape
-import Lex
-import SymbolTable
-import VMWriter
+from Lex import *
+from SymbolTable import *
+from VMWriter import *
 from JackConstant import *
 
-# Parses Jack input.  Tries to give useful error messages.
+# Parses Jack source code and generates VM code for it.
 
 class ParserError(Exception):
     def __init__(self, message):
@@ -15,14 +15,14 @@ class ParserError(Exception):
     
 class Parser(object):
     def __init__(self, file):
-        self.lex = Lex.Lex(file)
-        self.symbols = SymbolTable.SymbolTable()
-        self.vm = VMWriter.VMWriter(file)
+        self.lex = Lex(file)
+        self.symbols = SymbolTable()
+        self.vm = VMWriter()
         self.label_num = 0
         self.openout(file)
         self.compile_class()
         self.closeout()
-        print(self.symbols)
+        #print(self.symbols)
         
     # Parsing context
     def cur_class(self):
@@ -34,17 +34,25 @@ class Parser(object):
     # VMWriter support
     
     # TO FIX:
-    vm_cmds = {'+':'add', '-':'sub', '*':'call os.Multiply', '/':'call os.Divide',
-               '<':'less', '>':'greater', '=':'equal', '&':'and', '|':'or'}
+    vm_cmds = {'+':'add', '-':'sub', '*':'call Math.multiply 2', '/':'call Math.divide 2',
+               '<':'lt', '>':'gt', '=':'eq', '&':'and', '|':'or'}
     vm_unary_cmds = {'-':'neg', '~':'not'}
-    segments = {SK_STATIC:'static', SK_FIELD:'static', SK_ARG:'argument', SK_VAR:'local'}
+    segments = {SK_STATIC:'static', SK_FIELD:'this', SK_ARG:'argument', SK_VAR:'local', None:'ERROR'}
     
     def vm_function_name(self):
         return self.cur_class()+'.'+self.cur_subroutine()
         
-    def write_vm_cmd(self, cmd, arg1='', arg2=''):
-        self.vm.write_vm_cmd(cmd, arg1, arg2)
-
+    def vm_push_variable(self, name):
+        (type, kind, index) = self.symbols.lookup(name)
+        #print('push_variable: name=',name,'type=',type,'kind=',kind,'index=',index)
+        if kind == None:
+            raise ParserError('bad push')
+        self.vm.write_push(self.segments[kind], index)
+        
+    def vm_pop_variable(self, name):
+        (type, kind, index) = self.symbols.lookup(name)
+        self.vm.write_pop(self.segments[kind], index)        
+        
     # Routines to advance the token
     def _require(self, tok, val=None):
         lextok, lexval = self._advance()
@@ -149,13 +157,10 @@ class Parser(object):
             
     def compile_type(self):
         if self._is_type(): 
-            return self.type_of(*self._advance())
+            return self._advance()[1]
         else:               
             raise ParserError(self._require_failed_msg(*self.lex.peek()))
         
-    def type_of(self, tok, val):
-        return val
-            
     def _is_var_name(self):
         return self._is_token(T_ID)
         
@@ -168,29 +173,24 @@ class Parser(object):
         
     def compile_subroutine(self):
         self._start_non_terminal('subroutineDec')
-        kwd = self._advance()
+        tok, kwd = self._advance()
         type = self.compile_void_or_type()
         self._cur_subroutine = self.compile_var_name()
         self.symbols.start_subroutine()
         self._require(T_SYM, '(')
-        num_args = self.compile_parameter_list()
+        self.compile_parameter_list()
         self._require(T_SYM, ')')
-        self.vm.write_function(self.vm_function_name(), num_args)
-        self.compile_subroutine_body()
+        self.compile_subroutine_body(kwd)
         self._end_non_terminal()
                 
     def compile_parameter_list(self):
         self._start_non_terminal('parameterList')
-        num_args = 0
         if self._is_type():
             self.compile_parameter()
-            num_args = 1
             while self._is_sym(','):
                 self._advance()
                 self.compile_parameter()
-                num_args += 1
         self._end_non_terminal()
-        return num_args
               
     def compile_parameter(self):
         if self._is_type():
@@ -198,14 +198,25 @@ class Parser(object):
             name = self.compile_var_name()
             self.symbols.define(name, type, SK_ARG)
             
-    def compile_subroutine_body(self):
+    def compile_subroutine_body(self, kwd):
         self._start_non_terminal('subroutineBody')
         self._require(T_SYM, '{')
         while self._is_var_dec():
             self.compile_var_dec()
+        self.write_func_decl(kwd)
         self.compile_statements()
         self._require(T_SYM, '}')
         self._end_non_terminal()
+
+    def write_func_decl(self, kwd):
+        self.vm.write_function(self.vm_function_name(), self.symbols.var_count(SK_VAR))
+        if kwd == KW_METHOD:
+            self.vm.write_push('argument', 0)   # Set up 'this' to point at current object
+            self.vm.write_pop('pointer', 0)
+        elif kwd == KW_CONSTRUCTOR:
+            self.vm.write_push('constant', self.symbols.var_count(SK_FIELD))
+            self.vm.write_call('Memory.alloc', 1)   # call Memory.alloc(object_size)
+            self.vm.write_pop('pointer', 0)         # set up 'this' pointer to point to new object
         
     def _is_var_dec(self):
         return self._is_keyword(KW_VAR)
@@ -213,8 +224,9 @@ class Parser(object):
     def compile_var_dec(self):
         self._start_non_terminal('varDec')
         self._require(T_KEYWORD, KW_VAR)
-        self._compile_dec(SK_VAR)
+        num_vars = self._compile_dec(SK_VAR)
         self._end_non_terminal()
+        return num_vars
         
     # Statements
     def compile_statements(self):
@@ -241,6 +253,7 @@ class Parser(object):
         self._require(T_KEYWORD, KW_DO)
         name = self._require(T_ID)
         self.compile_subroutine_call(name)  # VM code for subroutine call
+        self.vm.write_pop('temp', 0)        # Pop return value and discard
         self._require(T_SYM, ';')
         self._end_non_terminal()
         
@@ -251,16 +264,25 @@ class Parser(object):
         self._start_non_terminal('letStatement')
         self._require(T_KEYWORD, KW_LET)
         name = self.compile_var_name()
-        if self._is_sym('['):
+        subscript = self._is_sym('[')
+        if subscript:
+            self.vm_push_variable(name)     # push array ptr onto stack
             self._advance()
-            self.compile_expression()
+            self.compile_expression()       # push index onto stack
             self._require(T_SYM, ']')
+            self.vm.write_vm_cmd('add')     # base+index
+            self.vm.write_pop('temp', 1)    # save base+index into temp register
         self._require(T_SYM, '=')
         self.compile_expression()
         self._require(T_SYM, ';')
-        self.vm.write_pop(name, 0)      # FIX THIS
+        if subscript:
+            self.vm.write_push('temp', 1)   # push base+index
+            self.vm.write_pop('pointer', 1) # pop base+index into 'that' register
+            self.vm.write_pop('that', 0)    # pop value into *(base+index)
+        else:
+            self.vm_pop_variable(name)      # pop value directly into variable
         self._end_non_terminal()
-        
+
     def _is_while(self):
         return self._is_keyword(KW_WHILE)
         
@@ -312,7 +334,7 @@ class Parser(object):
         self._require(T_SYM, ')')
         self.vm.write_vm_cmd('not')     # ~(cond)
         notif_label = self.new_label()
-        self.vm.write_goto(notif_label) # if-goto notif_label
+        self.vm.write_if(notif_label)   # if-goto notif_label
         self._require(T_SYM, '{')
         self.compile_statements()       # VM code for if statements
         self._require(T_SYM, '}')
@@ -327,7 +349,7 @@ class Parser(object):
         while self._is_op():
             op = self._advance()
             self.compile_term()
-            self.write_vm_cmd(self.vm_cmds[op[1]])  # op
+            self.vm.write_vm_cmd(self.vm_cmds[op[1]])  # op
         self._end_non_terminal()
         
     def _is_term(self):
@@ -350,14 +372,15 @@ class Parser(object):
         elif self._is_unary_op():
             tok, op = self._advance()
             self.compile_term()
-            self.write_vm_cmd(self.vm_unary_cmds[op])    # op
+            self.vm.write_vm_cmd(self.vm_unary_cmds[op])    # op
         elif self._is_var_name():
             tok, name = self._advance()
-            self.vm.write_push(name, 0)             # FIX THIS
             if self._is_sym('['):
                 self._compile_array_subscript(name) # VM code for array subscript
             elif self._is_sym('(.'):
                 self.compile_subroutine_call(name)  # VM code for subroutine call
+            else:
+                self.vm_push_variable(name)             # push variable on stack
         self._end_non_terminal()
 
     def push_const(self):
@@ -365,31 +388,58 @@ class Parser(object):
         if tok == T_NUM:
             self.vm.write_push('constant', val)     # push constant val
         elif tok == T_STR:
-            self.vm.write_push('string', val)       # FIX THIS
+            self.vm.write_push('constant', len(val))
+            self.vm.write_call('String.new', 1)     # String.new(len(str))
+            for c in val:
+                self.vm.write_push('constant', ord(c))
+                self.vm.write_call('String.appendChar', 2)  # String.appendChar(nextchar)
         elif tok == T_KEYWORD:
             self.push_kwd_const(val)
             
     def push_kwd_const(self, kwd):
         if kwd == KW_THIS:
-            self.vm.write_push('this', 0)       # FIX THIS
-        else:
-            kwd_const_val = {KW_TRUE:-1, KW_FALSE:0, KW_NULL:0}
-            self.vm.write_push('constant', kwd_const_val[kwd])
+            self.vm.write_push('this', 0)
+        elif kwd == KW_TRUE:
+            self.vm.write_push('constant', 1)
+            self.vm.write_vm_cmd('neg')
+        else:   # KW_FALSE or KW_NULL
+            self.vm.write_push('constant', 0)
     
     def _compile_array_subscript(self, name):
+        self.vm_push_variable(name)     # push array ptr onto stack
         self._require(T_SYM, '[')
-        self.compile_expression()
+        self.compile_expression()       # push index onto stack
         self._require(T_SYM, ']')
+        self.vm.write_vm_cmd('add')     # base+index
+        self.vm.write_pop('pointer', 1) # pop into 'that' ptr
+        self.vm.write_push('that', 0)   # push *(base+index) onto stack
 
     def compile_subroutine_call(self, name):
+        (type, kind, index) = self.symbols.lookup(name)
+        num_args = 0
         if self._is_sym('.'):
-            self.vm.write_push(name, 0)  # push name - FIX THIS
+            object_name = name
             self._advance()
             name = self._require(T_ID)
+            if self._is_builtin_type(type):     # e.g. int.func(123) not allowed
+                ParserError('Cannot use "." operator on builtin type')
+            elif type == None:                  # Calling using class name
+                name = object_name+'.'+name
+            else:                               # Calling using object variable name
+                self.vm_push_variable(object_name)     # push object ptr onto stack   
+                num_args = 1
+                name = self.symbols.type_of(object_name)+'.'+name
+        else:
+            self.vm.write_push('pointer', 0)    # push this
+            num_args = 1
+            name = self.cur_class()+'.'+name
         self._require(T_SYM, '(')
-        num_args = self.compile_expr_list() # VM code to push arguments
+        num_args += self.compile_expr_list() # VM code to push arguments
         self._require(T_SYM, ')')
         self.vm.write_call(name, num_args)  # call name num_args
+    
+    def _is_builtin_type(self, type):
+        return type in [KW_INT, KW_CHAR, KW_BOOLEAN, KW_VOID]
         
     def _is_unary_op(self):
         return self._is_sym('-~')

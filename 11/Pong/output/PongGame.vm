@@ -1,269 +1,309 @@
 function PongGame.new 0
-push Screen 0
-call clearScreen 0
+push constant 7
+call Memory.alloc 1
+pop pointer 0
+call Screen.clearScreen 0
+pop temp 0
 push constant 50
-pop batWidth 0
-push Bat 0
-push Bat 0
+pop this 6
 push constant 230
 push constant 229
-push batWidth 0
+push this 6
 push constant 7
-call new 4
-pop bat 0
-push Ball 0
-push Ball 0
+call Bat.new 4
+pop this 0
 push constant 253
 push constant 222
 push constant 0
 push constant 511
 push constant 0
 push constant 229
-call new 6
-pop ball 0
-push ball 0
+call Ball.new 6
+pop this 1
+push this 1
 push constant 400
 push constant 0
-call setDestination 2
-push Screen 0
+call Ball.setDestination 3
+pop temp 0
 push constant 0
 push constant 238
 push constant 511
 push constant 240
-call drawRectangle 4
-push Output 0
+call Screen.drawRectangle 4
+pop temp 0
 push constant 22
 push constant 0
-call moveCursor 2
-push Output 0
-push string Score: 
-call printString 1
+call Output.moveCursor 2
+pop temp 0
+push constant 7
+call String.new 1
+push constant 83
+call String.appendChar 2
+push constant 99
+call String.appendChar 2
+push constant 111
+call String.appendChar 2
+push constant 114
+call String.appendChar 2
+push constant 101
+call String.appendChar 2
+push constant 58
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+call Output.printString 1
+pop temp 0
 push constant 0
-pop exit 0
+pop this 3
 push constant 0
-pop score 0
+pop this 4
 push constant 0
-pop wall 0
+pop this 2
 push constant 0
-pop lastWall 0
+pop this 5
 push this 0
 return  
 function PongGame.dispose 0
-push bat 0
-call dispose 0
-push ball 0
-call dispose 0
-push Memory 0
+push argument 0
+pop pointer 0
 push this 0
-call deAlloc 1
+call Bat.dispose 1
+pop temp 0
+push this 1
+call Ball.dispose 1
+pop temp 0
+push this 0
+call Memory.deAlloc 1
+pop temp 0
 push constant 0
 return  
 function PongGame.newInstance 0
-push PongGame 0
-push PongGame 0
-call new 0
-pop instance 0
+call PongGame.new 0
+pop static 0
 push constant 0
 return  
 function PongGame.getInstance 0
-push instance 0
+push static 0
 return  
-function PongGame.run 0
+function PongGame.run 1
+push argument 0
+pop pointer 0
 label label1 
-push exit 0
+push this 3
 not  
 not  
-goto label2 
+if-goto label2 
 label label3 
-push key 0
+push local 0
 push constant 0
-equal  
-push exit 0
+eq  
+push this 3
 not  
 and  
 not  
-goto label4 
-push Keyboard 0
-push Keyboard 0
-call keyPressed 0
-pop key 0
-push bat 0
-call move 0
-call moveBall 0
+if-goto label4 
+call Keyboard.keyPressed 0
+pop local 0
+push this 0
+call Bat.move 1
+pop temp 0
+push pointer 0
+call PongGame.moveBall 1
+pop temp 0
 goto label3 
 label label4 
-push key 0
+push local 0
 push constant 130
-equal  
+eq  
 not  
-goto label6 
-push bat 0
+if-goto label6 
+push this 0
 push constant 1
-call setDirection 1
+call Bat.setDirection 2
+pop temp 0
 goto label5 
 label label6 
-push key 0
+push local 0
 push constant 132
-equal  
+eq  
 not  
-goto label8 
-push bat 0
+if-goto label8 
+push this 0
 push constant 2
-call setDirection 1
+call Bat.setDirection 2
+pop temp 0
 goto label7 
 label label8 
-push key 0
+push local 0
 push constant 140
-equal  
+eq  
 not  
-goto label10 
-push constant -1
-pop exit 0
+if-goto label10 
+push constant 1
+neg  
+pop this 3
 goto label9 
 label label10 
 label label9 
 label label7 
 label label5 
 label label11 
-push key 0
+push local 0
 push constant 0
-equal  
+eq  
 not  
-push exit 0
+push this 3
 not  
 and  
 not  
-goto label12 
-push Keyboard 0
-push Keyboard 0
-call keyPressed 0
-pop key 0
-push bat 0
-call move 0
-call moveBall 0
+if-goto label12 
+call Keyboard.keyPressed 0
+pop local 0
+push this 0
+call Bat.move 1
+pop temp 0
+push pointer 0
+call PongGame.moveBall 1
+pop temp 0
 goto label11 
 label label12 
 goto label1 
 label label2 
-push exit 0
+push this 3
 not  
-goto label14 
-push Output 0
+if-goto label14 
 push constant 10
 push constant 27
-call moveCursor 2
-push Output 0
-push string Game Ove
-call printString 1
+call Output.moveCursor 2
+pop temp 0
+push constant 8
+call String.new 1
+push constant 71
+call String.appendChar 2
+push constant 97
+call String.appendChar 2
+push constant 109
+call String.appendChar 2
+push constant 101
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 79
+call String.appendChar 2
+push constant 118
+call String.appendChar 2
+push constant 101
+call String.appendChar 2
+call Output.printString 1
+pop temp 0
 goto label13 
 label label14 
 label label13 
 push constant 0
 return  
-function PongGame.moveBall 0
-push ball 0
-push ball 0
-call move 0
-pop wall 0
-push wall 0
+function PongGame.moveBall 5
+push argument 0
+pop pointer 0
+push this 1
+call Ball.move 1
+pop this 2
+push this 2
 push constant 0
-greater  
-push wall 0
-push lastWall 0
-equal  
+gt  
+push this 2
+push this 5
+eq  
 not  
 and  
 not  
-goto label16 
-push wall 0
-pop lastWall 0
+if-goto label16 
+push this 2
+pop this 5
 push constant 0
-pop bouncingDirection 0
-push bat 0
-push bat 0
-call getLeft 0
-pop batLeft 0
-push bat 0
-push bat 0
-call getRight 0
-pop batRight 0
-push ball 0
-push ball 0
-call getLeft 0
-pop ballLeft 0
-push ball 0
-push ball 0
-call getRight 0
-pop ballRight 0
-push wall 0
+pop local 0
+push this 0
+call Bat.getLeft 1
+pop local 1
+push this 0
+call Bat.getRight 1
+pop local 2
+push this 1
+call Ball.getLeft 1
+pop local 3
+push this 1
+call Ball.getRight 1
+pop local 4
+push this 2
 push constant 4
-equal  
+eq  
 not  
-goto label18 
-push batLeft 0
-push ballRight 0
-greater  
-push batRight 0
-push ballLeft 0
-less  
+if-goto label18 
+push local 1
+push local 4
+gt  
+push local 2
+push local 3
+lt  
 or  
-pop exit 0
-push exit 0
+pop this 3
+push this 3
 not  
 not  
-goto label20 
-push ballRight 0
-push batLeft 0
+if-goto label20 
+push local 4
+push local 1
 push constant 10
 add  
-less  
+lt  
 not  
-goto label22 
+if-goto label22 
 push constant 1
 neg  
-pop bouncingDirection 0
+pop local 0
 goto label21 
 label label22 
-push ballLeft 0
-push batRight 0
+push local 3
+push local 2
 push constant 10
 sub  
-greater  
+gt  
 not  
-goto label24 
+if-goto label24 
 push constant 1
-pop bouncingDirection 0
+pop local 0
 goto label23 
 label label24 
 label label23 
 label label21 
-push batWidth 0
+push this 6
 push constant 2
 sub  
-pop batWidth 0
-push bat 0
-push batWidth 0
-call setWidth 1
-push score 0
+pop this 6
+push this 0
+push this 6
+call Bat.setWidth 2
+pop temp 0
+push this 4
 push constant 1
 add  
-pop score 0
-push Output 0
+pop this 4
 push constant 22
 push constant 7
-call moveCursor 2
-push Output 0
-push score 0
-call printInt 1
+call Output.moveCursor 2
+pop temp 0
+push this 4
+call Output.printInt 1
+pop temp 0
 goto label19 
 label label20 
 label label19 
 goto label17 
 label label18 
 label label17 
-push ball 0
-push bouncingDirection 0
-call bounce 1
+push this 1
+push local 0
+call Ball.bounce 2
+pop temp 0
 goto label15 
 label label16 
 label label15 
