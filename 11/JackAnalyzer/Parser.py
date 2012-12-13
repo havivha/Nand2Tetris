@@ -398,7 +398,7 @@ class Parser(object):
             
     def push_kwd_const(self, kwd):
         if kwd == KW_THIS:
-            self.vm.write_push('this', 0)
+            self.vm.write_push('pointer', 0)
         elif kwd == KW_TRUE:
             self.vm.write_push('constant', 1)
             self.vm.write_vm_cmd('neg')
