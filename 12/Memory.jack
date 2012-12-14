@@ -1,0 +1,32 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/12/Memory.jack
+
+/**
+ * Memory operations library.
+ */ 
+class Memory {
+
+    /** Initializes memory parameters. */
+    function void init() {
+    }
+
+    /** Returns the value of the main memory at the given address. */
+    function int peek(int address) {
+    }
+
+    /** Sets the value of the main memory at this address
+     *  to the given value. */
+    function void poke(int address, int value) {
+    }
+
+    /** finds and allocates from the heap a memory block of the 
+     *  specified size and returns a reference to its base address. */
+    function int alloc(int size) {
+    }
+
+    /** De-allocates the given object and frees its space. */
+    function void deAlloc(int object) {
+    }    
+}

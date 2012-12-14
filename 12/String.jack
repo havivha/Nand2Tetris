@@ -1,0 +1,60 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/12/String.jack
+
+/**
+ * Represents a String object. Implements the String type.
+ */
+class String {
+
+    /** Constructs a new empty String with a maximum length of maxLength. */
+    constructor String new(int maxLength) {
+    }
+
+    /** De-allocates the string and frees its space. */
+    method void dispose() {
+    }
+
+    /** Returns the current length of this String. */
+    method int length() {
+    }
+
+    /** Returns the character at location j. */
+    method char charAt(int j) {
+    }
+
+    /** Sets the j'th character of this string to be c. */
+    method void setCharAt(int j, char c) {
+    }
+
+    /** Appends the character c to the end of this String.
+     *  Returns this string as the return value. */
+    method String appendChar(char c) {
+    }
+
+    /** Erases the last character from this String. */
+    method void eraseLastChar() {
+    }
+
+    /** Returns the integer value of this String until the first non
+     *  numeric character. */
+    method int intValue() {
+    }
+
+    /** Sets this String to hold a representation of the given number. */
+    method void setInt(int number) {
+    }
+
+    /** Returns the new line character. */
+    function char newLine() {
+    }
+
+    /** Returns the backspace character. */
+    function char backSpace() {
+    }
+
+    /** Returns the double quote (") character. */
+    function char doubleQuote() {
+    }
+}
