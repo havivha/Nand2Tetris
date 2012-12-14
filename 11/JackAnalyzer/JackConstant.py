@@ -38,15 +38,25 @@ keywords = [KW_CLASS, KW_METHOD, KW_FUNCTION, KW_CONSTRUCTOR, KW_INT, KW_BOOLEAN
             KW_CHAR, KW_VOID, KW_VAR, KW_STATIC, KW_FIELD, KW_LET, KW_DO, KW_IF,
             KW_ELSE, KW_WHILE, KW_RETURN, KW_TRUE, KW_FALSE, KW_NULL, KW_THIS]
 
-# Tokens for sample output
-tokens = ['keyword', 'symbol', 'integerConstant', 'stringConstant', 'identifier']
-
 # Symbols for token type T_SYM
 symbols = '{}()[].,;+-*/&|<>=~'
 
 # Symbol kinds
-SK_STATIC   = 'static'
-SK_FIELD    = 'field'
-SK_ARG      = 'arg'
-SK_VAR      = 'var'
-SK_NONE     = 'none'
+SK_STATIC   = 0
+SK_FIELD    = 1
+SK_ARG      = 2
+SK_VAR      = 3
+SK_NONE     = 4
+
+# Convert keywords to symbol kinds
+kwd_to_kind = {KW_STATIC:SK_STATIC, KW_FIELD:SK_FIELD}
+
+# VM Writer Support
+vm_cmds = {'+':'add', '-':'sub', '*':'call Math.multiply 2', '/':'call Math.divide 2',
+           '<':'lt', '>':'gt', '=':'eq', '&':'and', '|':'or'}
+vm_unary_cmds = {'-':'neg', '~':'not'}
+segments = {SK_STATIC:'static', SK_FIELD:'this', SK_ARG:'argument', SK_VAR:'local', None:'ERROR'} 
+
+# Temporary registers
+TEMP_RETURN = 0     # Use temp 0 for popping an unused return value
+TEMP_ARRAY = 1      # Use temp 1 for temporarily saving value to assign to array

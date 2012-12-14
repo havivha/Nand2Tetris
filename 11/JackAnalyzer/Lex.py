@@ -16,14 +16,6 @@ class Lex(object):
         self._token_type = T_ERROR  # Current token type
         self._cur_val = 0           # Current token value
     
-    def openout(self, file):
-        self._outfile = open(file.replace('.jack', 'T.xml'), 'w')
-        self._outfile.write('<tokens>\n')
-
-    def closeout(self):
-        self._outfile.write('</tokens>')
-        self._outfile.close()
-        
     def has_more_tokens(self):
         return self._tokens != []
         
@@ -32,7 +24,6 @@ class Lex(object):
             self._token_type, self._cur_val = self._tokens.pop()
         else:
             self._token_type, self._cur_val = (T_ERROR, 0)
-        self._writexml()
         return (self._token_type, self._cur_val)
         
     def peek(self):
@@ -41,23 +32,6 @@ class Lex(object):
         else:
             return (T_ERROR, 0)
 
-    def _writexml(self):
-        tok, val = self._token_type, self._cur_val
-        self._write_start_tag(tokens[tok])
-        if   tok == T_KEYWORD:  self._outfile.write(self.keyword())
-        elif tok == T_SYM:      self._outfile.write(escape(self.symbol()))
-        elif tok == T_NUM:      self._outfile.write(self.int_val())
-        elif tok == T_STR:      self._outfile.write(self.string_val())
-        elif tok == T_ID:       self._outfile.write(self.identifier())
-        elif tok == T_ERROR:    self._outfile.write('<<ERROR>>')
-        self._write_end_tag(tokens[tok])
-        
-    def _write_start_tag(self, token):
-        self._outfile.write('<'+token+'> ')
-    
-    def _write_end_tag(self, token):
-        self._outfile.write(' </'+token+'>\n')
-        
     def token_type(self):
         return self._token_type
         

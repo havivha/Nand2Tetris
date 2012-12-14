@@ -15,8 +15,6 @@ class VMWriter(object):
         self._outfile.close()
 
     def write_push(self, segment, index):
-        if segment==None:
-            Exception()
         self.write_vm_cmd('push', segment, index)
         
     def write_pop(self, segment, index):
@@ -45,3 +43,31 @@ class VMWriter(object):
         
     def write_vm_cmd(self, cmd, arg1='', arg2=''):
         self._outfile.write(cmd+' '+str(arg1)+' '+str(arg2)+'\n')
+        
+    # Helpers to make things easier
+    def push_const(self, val):
+        self.write_push('constant', val)
+        
+    def push_arg(self, arg_num):
+        self.write_push('argument', arg_num)
+        
+    def push_this_ptr(self):
+        self.write_push('pointer', 0)
+        
+    def pop_this_ptr(self):
+        self.write_pop('pointer', 0)
+        
+    def pop_that_ptr(self):
+        self.write_pop('pointer', 1)
+        
+    def push_that(self):
+        self.write_push('that', 0)
+        
+    def pop_that(self):
+        self.write_pop('that', 0)
+        
+    def push_temp(self, temp_num):
+        self.write_push('temp', temp_num)
+        
+    def pop_temp(self, temp_num):
+        self.write_pop('temp', temp_num)

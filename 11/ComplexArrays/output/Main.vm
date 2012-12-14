@@ -11,26 +11,26 @@ pop local 2
 push local 0
 push constant 3
 add  
-pop temp 1
 push constant 2
-push temp 1
+pop temp 1
 pop pointer 1
+push temp 1
 pop that 0
 push local 0
 push constant 4
 add  
-pop temp 1
 push constant 8
-push temp 1
+pop temp 1
 pop pointer 1
+push temp 1
 pop that 0
 push local 0
 push constant 5
 add  
-pop temp 1
 push constant 4
-push temp 1
+pop temp 1
 pop pointer 1
+push temp 1
 pop that 0
 push local 1
 push local 0
@@ -39,7 +39,6 @@ add
 pop pointer 1
 push that 0
 add  
-pop temp 1
 push local 0
 push constant 3
 add  
@@ -47,8 +46,9 @@ pop pointer 1
 push that 0
 push constant 3
 add  
-push temp 1
+pop temp 1
 pop pointer 1
+push temp 1
 pop that 0
 push local 0
 push local 1
@@ -61,7 +61,6 @@ add
 pop pointer 1
 push that 0
 add  
-pop temp 1
 push local 0
 push local 0
 push constant 5
@@ -88,16 +87,17 @@ add
 pop pointer 1
 push that 0
 call Math.multiply 2  
-push temp 1
+pop temp 1
 pop pointer 1
+push temp 1
 pop that 0
 push local 2
 push constant 0
 add  
-pop temp 1
 push constant 0
-push temp 1
+pop temp 1
 pop pointer 1
+push temp 1
 pop that 0
 push local 2
 push constant 0
@@ -426,10 +426,10 @@ pop local 2
 push local 2
 push constant 1
 add  
-pop temp 1
 push constant 33
-push temp 1
+pop temp 1
 pop pointer 1
+push temp 1
 pop that 0
 push local 0
 push constant 7
@@ -440,10 +440,10 @@ pop local 2
 push local 2
 push constant 1
 add  
-pop temp 1
 push constant 77
-push temp 1
+pop temp 1
 pop pointer 1
+push temp 1
 pop that 0
 push local 0
 push constant 3
@@ -454,7 +454,6 @@ pop local 1
 push local 1
 push constant 1
 add  
-pop temp 1
 push local 1
 push constant 1
 add  
@@ -466,8 +465,9 @@ add
 pop pointer 1
 push that 0
 add  
-push temp 1
+pop temp 1
 pop pointer 1
+push temp 1
 pop that 0
 goto label1 
 label label2 
@@ -701,11 +701,11 @@ pop argument 1
 push argument 0
 push argument 1
 add  
-pop temp 1
 push constant 3
 call Array.new 1
-push temp 1
+pop temp 1
 pop pointer 1
+push temp 1
 pop that 0
 goto label3 
 label label4 

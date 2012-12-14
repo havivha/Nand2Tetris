@@ -12,10 +12,10 @@ class SymbolTable(object):
         self.index = {SK_STATIC:0, SK_FIELD:0, SK_ARG:0, SK_VAR:0}
     
     def __str__(self):
-        return self.print_symbols('class', self.class_symbols)    \
-             + self.print_symbols('subroutine', self.subroutine_symbols)
+        return self.symbol_string('class', self.class_symbols)    \
+             + self.symbol_string('subroutine', self.subroutine_symbols)
         
-    def print_symbols(self, name, table):
+    def symbol_string(self, name, table):
         result = 'symbol table '+name+':\n'
         for n, (t, k, i) in table.items():
             result += 'symbol name:'+n+', type:'+t+', kind:'+k+', index:'+str(i)+'\n'

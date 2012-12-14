@@ -53,7 +53,6 @@ if-goto label2
 push local 0
 push local 2
 add  
-pop temp 1
 push constant 23
 call String.new 1
 push constant 69
@@ -103,8 +102,9 @@ call String.appendChar 2
 push constant 32
 call String.appendChar 2
 call Keyboard.readInt 1
-push temp 1
+pop temp 1
 pop pointer 1
+push temp 1
 pop that 0
 push local 2
 push constant 1
