@@ -127,7 +127,7 @@
 <symbol> . </symbol>
 <identifier> printString </identifier>
 <symbol> ( </symbol>
-<stringConstant> Score:  </stringConstant>
+<stringConstant> Score: 0 </stringConstant>
 <symbol> ) </symbol>
 <symbol> ; </symbol>
 <keyword> let </keyword>
@@ -376,7 +376,7 @@
 <symbol> . </symbol>
 <identifier> printString </identifier>
 <symbol> ( </symbol>
-<stringConstant> Game Ove </stringConstant>
+<stringConstant> Game Over </stringConstant>
 <symbol> ) </symbol>
 <symbol> ; </symbol>
 <symbol> } </symbol>

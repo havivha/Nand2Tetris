@@ -86,11 +86,11 @@ return
 function Ball.setDestination 3
 push argument 0
 pop pointer 0
-push argument 0
+push argument 1
 push this 0
 sub  
 pop this 2
-push argument 1
+push argument 2
 push this 1
 sub  
 pop this 3
@@ -114,21 +114,21 @@ pop local 0
 push local 2
 pop local 1
 push this 1
-push argument 1
+push argument 2
 lt  
 pop this 8
 push this 0
-push argument 0
+push argument 1
 lt  
 pop this 9
 goto label1 
 label label2 
 push this 0
-push argument 0
+push argument 1
 lt  
 pop this 8
 push this 1
-push argument 1
+push argument 2
 lt  
 pop this 9
 label label1 
@@ -308,7 +308,7 @@ push this 3
 push constant 10
 call Math.divide 2  
 pop local 3
-push argument 0
+push argument 1
 push constant 0
 eq  
 not  
@@ -321,7 +321,7 @@ push this 2
 push constant 0
 lt  
 not  
-push argument 0
+push argument 1
 push constant 1
 eq  
 and  
@@ -329,7 +329,7 @@ push this 2
 push constant 0
 lt  
 or  
-push argument 0
+push argument 1
 push constant 1
 neg  
 eq  

@@ -177,6 +177,8 @@ class Parser(object):
         type = self.compile_void_or_type()
         self._cur_subroutine = self.compile_var_name()
         self.symbols.start_subroutine()
+        if kwd == KW_METHOD:
+            self.symbols.define('this', self.cur_class(), SK_ARG)
         self._require(T_SYM, '(')
         self.compile_parameter_list()
         self._require(T_SYM, ')')

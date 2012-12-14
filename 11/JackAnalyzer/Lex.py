@@ -96,7 +96,7 @@ class Lex(object):
         if   self._is_keyword(word):    return (T_KEYWORD, word)
         elif self._is_sym(word):        return (T_SYM, word)
         elif self._is_num(word):        return (T_NUM, word)
-        elif self._is_str(word):        return (T_STR, word[1:-2])
+        elif self._is_str(word):        return (T_STR, word[1:-1])
         elif self._is_id(word):         return (T_ID, word)
         else:                           return (T_ERROR, word)
 

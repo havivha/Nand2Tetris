@@ -311,7 +311,7 @@
 <expressionList>
 <expression>
 <term>
-<stringConstant> Test 1 - Required result: 5, Actual result: </stringConstant>
+<stringConstant> Test 1 - Required result: 5, Actual result:  </stringConstant>
 </term>
 </expression>
 </expressionList>
@@ -361,7 +361,7 @@
 <expressionList>
 <expression>
 <term>
-<stringConstant> Test 2 - Required result: 40, Actual result: </stringConstant>
+<stringConstant> Test 2 - Required result: 40, Actual result:  </stringConstant>
 </term>
 </expression>
 </expressionList>
@@ -411,7 +411,7 @@
 <expressionList>
 <expression>
 <term>
-<stringConstant> Test 3 - Required result: 0, Actual result: </stringConstant>
+<stringConstant> Test 3 - Required result: 0, Actual result:  </stringConstant>
 </term>
 </expression>
 </expressionList>
@@ -631,7 +631,7 @@
 <expressionList>
 <expression>
 <term>
-<stringConstant> Test 4 - Required result: 77, Actual result: </stringConstant>
+<stringConstant> Test 4 - Required result: 77, Actual result:  </stringConstant>
 </term>
 </expression>
 </expressionList>
@@ -681,7 +681,7 @@
 <expressionList>
 <expression>
 <term>
-<stringConstant> Test 5 - Required result: 110, Actual result: </stringConstant>
+<stringConstant> Test 5 - Required result: 110, Actual result:  </stringConstant>
 </term>
 </expression>
 </expressionList>

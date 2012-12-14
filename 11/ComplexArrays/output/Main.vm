@@ -105,7 +105,7 @@ add
 pop pointer 1
 push that 0
 pop local 2
-push constant 43
+push constant 44
 call String.new 1
 push constant 84
 call String.appendChar 2
@@ -193,6 +193,8 @@ push constant 116
 call String.appendChar 2
 push constant 58
 call String.appendChar 2
+push constant 32
+call String.appendChar 2
 call Output.printString 1
 pop temp 0
 push local 1
@@ -204,7 +206,7 @@ call Output.printInt 1
 pop temp 0
 call Output.println 0
 pop temp 0
-push constant 44
+push constant 45
 call String.new 1
 push constant 84
 call String.appendChar 2
@@ -294,6 +296,8 @@ push constant 116
 call String.appendChar 2
 push constant 58
 call String.appendChar 2
+push constant 32
+call String.appendChar 2
 call Output.printString 1
 pop temp 0
 push local 0
@@ -305,7 +309,7 @@ call Output.printInt 1
 pop temp 0
 call Output.println 0
 pop temp 0
-push constant 43
+push constant 44
 call String.new 1
 push constant 84
 call String.appendChar 2
@@ -393,6 +397,8 @@ push constant 116
 call String.appendChar 2
 push constant 58
 call String.appendChar 2
+push constant 32
+call String.appendChar 2
 call Output.printString 1
 pop temp 0
 push local 2
@@ -466,7 +472,7 @@ pop that 0
 goto label1 
 label label2 
 label label1 
-push constant 44
+push constant 45
 call String.new 1
 push constant 84
 call String.appendChar 2
@@ -556,6 +562,8 @@ push constant 116
 call String.appendChar 2
 push constant 58
 call String.appendChar 2
+push constant 32
+call String.appendChar 2
 call Output.printString 1
 pop temp 0
 push local 2
@@ -567,7 +575,7 @@ call Output.printInt 1
 pop temp 0
 call Output.println 0
 pop temp 0
-push constant 45
+push constant 46
 call String.new 1
 push constant 84
 call String.appendChar 2
@@ -658,6 +666,8 @@ call String.appendChar 2
 push constant 116
 call String.appendChar 2
 push constant 58
+call String.appendChar 2
+push constant 32
 call String.appendChar 2
 call Output.printString 1
 pop temp 0

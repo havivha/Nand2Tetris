@@ -29,7 +29,7 @@
 <symbol> . </symbol>
 <identifier> readInt </identifier>
 <symbol> ( </symbol>
-<stringConstant> How many numbers? </stringConstant>
+<stringConstant> How many numbers?  </stringConstant>
 <symbol> ) </symbol>
 <symbol> ; </symbol>
 <keyword> let </keyword>
@@ -64,7 +64,7 @@
 <symbol> . </symbol>
 <identifier> readInt </identifier>
 <symbol> ( </symbol>
-<stringConstant> Enter the next number: </stringConstant>
+<stringConstant> Enter the next number:  </stringConstant>
 <symbol> ) </symbol>
 <symbol> ; </symbol>
 <keyword> let </keyword>
@@ -115,7 +115,7 @@
 <symbol> . </symbol>
 <identifier> printString </identifier>
 <symbol> ( </symbol>
-<stringConstant> The average is: </stringConstant>
+<stringConstant> The average is:  </stringConstant>
 <symbol> ) </symbol>
 <symbol> ; </symbol>
 <keyword> do </keyword>
