@@ -7,25 +7,35 @@
  * Represents a String object. Implements the String type.
  */
 class String {
-
+    field Array buffer;
+    field int buffer_len;
+    field int str_len;
+    
     /** Constructs a new empty String with a maximum length of maxLength. */
     constructor String new(int maxLength) {
+        let buffer = Array.new(maxLength);
+        let buffer_len = maxLength;
+        let str_len = 0;
     }
 
     /** De-allocates the string and frees its space. */
     method void dispose() {
+        do Array.dispose(buffer);
     }
 
     /** Returns the current length of this String. */
     method int length() {
+        return str_len;
     }
 
     /** Returns the character at location j. */
     method char charAt(int j) {
+        return buffer[j];
     }
 
     /** Sets the j'th character of this string to be c. */
     method void setCharAt(int j, char c) {
+        let buffer[j] = c;
     }
 
     /** Appends the character c to the end of this String.

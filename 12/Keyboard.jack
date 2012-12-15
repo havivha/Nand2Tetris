@@ -7,9 +7,11 @@
  * A library for handling user input from the keyboard.
  */
 class Keyboard {
-
+    static Array keyboard;
+    
     /** Initializes the keyboard. */
     function void init() {
+        let keyboard = 24576;
     } 
 
     /**
@@ -33,6 +35,7 @@ class Keyboard {
      * F1 - F12 = 141 - 152
      */
     function char keyPressed() {
+        return keyboard[0];
     }
 
     /**								
@@ -41,6 +44,12 @@ class Keyboard {
      * the key to the screen, and returns the value of the pressed key.
      */
     function char readChar() {
+        var char key;
+        while( keyPressed() = 0 ) {}
+        key = keyPressed();
+        while( ~(keyPressed() = 0) ) {}
+        // Display character at next cursor position
+        return key;
     }
 
     /**								

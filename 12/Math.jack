@@ -8,31 +8,133 @@
  */
 class Math {
 
+    static int two_to_the[16];
+    
     /** Initializes the library. */
     function void init() {
+        let two_to_the[0] = 1;
+        let two_to_the[1] = 2;
+        let two_to_the[2] = 4;
+        let two_to_the[3] = 8;
+        let two_to_the[4] = 16;
+        let two_to_the[5] = 32;
+        let two_to_the[6] = 64;
+        let two_to_the[7] = 128;
+        let two_to_the[8] = 256;
+        let two_to_the[9] = 512;
+        let two_to_the[10] = 1024;
+        let two_to_the[11] = 2048;
+        let two_to_the[12] = 4096;
+        let two_to_the[13] = 8192;
+        let two_to_the[14] = 16384;
+        let two_to_the[15] = 32768;
+        return;
     }
 
+    function boolean bit(int x, int n) {
+        return (x & two_to_the[n]) = 1;
+    }
+    
     /** Returns the absolute value of x. */
     function int abs(int x) {
+        if( x < 0 ) {
+            let x = -x;
+        }
+        return x;
     }
 
     /** Returns the product of x and y. */
     function int multiply(int x, int y) {
+        var int neg_x, neg_y;
+        var int sum, shiftedX;
+        var int j;
+        var int mask;
+        
+        let neg_x = x < 0;
+        let neg_y = y < 0;
+        let x = Math.abs(x);
+        let y = Math.abs(y);
+        
+        let sum = 0;
+        let shiftedX = x;
+        let j = 0;
+        while( j < 16 ) {   // 16-bit numbers
+            if(bit(y, j)) {
+                let sum = sum + shiftedX;
+            }
+            let shiftedX = shiftedX + shiftedX;
+        }
+        if( neg_x = neg_y ) {
+            return result;
+        }
+        else {
+            return -result;
+        }
     }
-
+    
     /** Returns the integer part of x/y. */
     function int divide(int x, int y) {
+        var int neg_x, neg_y;
+        var int q;
+        
+        let neg_x = x < 0;
+        let neg_y = y < 0;
+        let x = Math.abs(x);
+        let y = Math.abs(y);
+
+        if( y > x ) {
+            return 0;
+        }
+        q = Math.divide(x, y+y);
+        if( x-(2*q*y) < y ) {
+            result = q+q;
+        }
+        else {
+            result = q+q+1;
+        }
+        
+        if( neg_x = neg_y ) {
+            return result;
+        }
+        else {
+            return -result;
+        }
     }
 
     /** Returns the integer part of the square root of x. */
     function int sqrt(int x) {
+        var int y;
+        var int approx;
+        
+        let y = 0;
+        let j = 7;      // = #bits / 2 - 1
+        while( ~(j < 0) ) {
+            let approx = two_to_the[j] * two_to_the[j]
+            if( ~(approx > x) & (approx > 0) ) {
+                let y = y + approx
+            }
+            let j = j - 1;
+        }
+        return y;
     }
 
     /** Returns the greater number. */
     function int max(int a, int b) {
+        if( a > b ) {
+            return a;
+        }
+        else {
+            return b;
+        }
     }
 
     /** Returns the smaller number. */
     function int min(int a, int b) {
+        if( a < b ) {
+            return a;
+        }
+        else {
+            return b;
+        }
     }
 }

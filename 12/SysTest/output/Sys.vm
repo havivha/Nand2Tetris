@@ -1,0 +1,67 @@
+function Sys.init 0
+call Math.init 0
+pop temp 0
+call Output.init 0
+pop temp 0
+call Screen.init 0
+pop temp 0
+call Keyboard.init 0
+pop temp 0
+call Memory.init 0
+pop temp 0
+call Main.main 0
+pop temp 0
+function Sys.halt 0
+label label1 
+push constant 1
+neg  
+not  
+if-goto label2 
+goto label1 
+label label2 
+function Sys.wait 2
+push constant 0
+pop local 0
+label label3 
+push local 0
+push argument 0
+lt  
+not  
+if-goto label4 
+push constant 0
+pop local 1
+label label5 
+push local 1
+push constant 200
+lt  
+not  
+if-goto label6 
+push local 1
+push constant 1
+add  
+pop local 1
+goto label5 
+label label6 
+push local 0
+push constant 1
+add  
+pop local 0
+goto label3 
+label label4 
+function Sys.error 0
+push constant 3
+call String.new 1
+push constant 69
+call String.appendChar 2
+push constant 114
+call String.appendChar 2
+push constant 114
+call String.appendChar 2
+call Output.printString 1
+pop temp 0
+push argument 0
+call Output.printInt 1
+pop temp 0
+push pointer 0
+call Sys.halt 1
+pop temp 0

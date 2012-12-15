@@ -16,14 +16,11 @@ class Sys {
         do Keyboard.init();
         do Memory.init();
         do Main.main();
-        do Sys.halt();
-        return;
     }
 
     /** Halts execution. */
     function void halt() {
         while(true){}
-        return;
     }
 
     /** Waits approximately duration milliseconds and then returns. */
@@ -37,14 +34,12 @@ class Sys {
             }
             let i = i + 1;
         }
-        return;
     }
 
     /** Prints the given error code in the form "ERR<errorCode>", and halts. */
     function void error(int errorCode) {
         do Output.printString("Err");
         do Output.printInt(errorCode);
-        do Sys.halt();
-        return;
+        do halt();
     }
 }

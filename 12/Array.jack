@@ -10,9 +10,11 @@ class Array {
 
     /** Constructs a new Array of the given size. */
     function Array new(int size) {
+        return Memory.alloc(size);
     }
 
     /** De-allocates the array and frees its space. */
     method void dispose() {
+        do Memory.deAlloc(this);
     }
 }
