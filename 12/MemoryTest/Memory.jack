@@ -32,7 +32,6 @@ class Memory {
         let ALLOC_SIZE = -1;
         let freeList[FL_LENGTH] = 16384-2048;
         let freeList[FL_NEXT] = null;
-        return;
     }
 
     /** Returns the value of the main memory at the given address. */
@@ -53,18 +52,18 @@ class Memory {
         var Array prev_block;
         var Array found_block;
         
-        let prev_block = Memory.best_fit(size);             // prev_block is the block before the found block
+        let prev_block = best_fit(size);                    // prev_block is the block before the found block
         if( prev_block = NO_BLOCK ) {
             let found_block = null;    // none found
         }
         else {
             if( prev_block = null ) {
                 let found_block = freeList;                 // New block is at the beginning of the freeList
-                let freeList = Memory.do_alloc(found_block, size); // Free list now starts a new first free block
+                let freeList = do_alloc(found_block, size); // Free list now starts a new first free block
             }
             else {
                 let found_block = prev_block[FL_NEXT];
-                let prev_block[FL_NEXT] = Memory.do_alloc(found_block, size);
+                let prev_block[FL_NEXT] = do_alloc(found_block, size);
             }
         }
         return found_block+1;
@@ -79,7 +78,7 @@ class Memory {
         var int cur_size;
         
         let best_block = NO_BLOCK;
-        let best_size = 16384 - 2048;
+        let best_size = 0;
         let cur_block = freeList;
         let prev_block = null;
         
@@ -107,13 +106,13 @@ class Memory {
             let next_block[FL_NEXT] = found_block[FL_NEXT];
             let next_block[FL_LENGTH] = found_block[FL_LENGTH] - (next_block - found_block);
             let found_block = found_block + 1;      // Point just after the alloc hdr
-            let found_block[ALLOC_SIZE] = size+1; // Size includes alloc hdr
+            let found_block[ALLOC_LENGTH] = size+1; // Size includes alloc hdr
         }
         else {      // Need to allocate the entire block
             let next_block = found_block[FL_NEXT];
             let block_size = found_block[FL_LENGTH];
             let found_block = found_block + 1;      // Point just after the alloc hdr
-            let found_block[ALLOC_SIZE] = block_size;
+            let found_block[ALLOC_LENGTH] = block_size;
         }
         
         return next_block;
@@ -121,12 +120,11 @@ class Memory {
     /** De-allocates the given object and frees its space. */
     function void deAlloc(Array object) {
         var int alloc_size;
-        var Array prev_block;
         var Array next_block;
         
         let alloc_size = object[ALLOC_SIZE];
         let object = object - 1;        // point to the beginning of the block
-        let prev_block = Memory.find_prev_free(object);
+        let prev_block = find_prev_free(object);
         
         if( prev_block = null ) {       // object becomes new start of freeList
             let object[FL_LENGTH] = alloc_size;
@@ -135,7 +133,7 @@ class Memory {
             let prev_block = object;
         }
         else {
-            if( (prev_block + prev_block[FL_LENGTH]) = object ) {
+            if( (prev_block + prev_block[FL_LENGTH]) = alloc ) {
                 // join prev free block with alloc block.
                 let prev_block[FL_LENGTH] = prev_block[FL_LENGTH] + alloc_size;
             }

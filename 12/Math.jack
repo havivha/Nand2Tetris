@@ -7,11 +7,11 @@
  * A basic math library.
  */
 class Math {
-
-    static int two_to_the[16];
+    static int two_to_the;
     
     /** Initializes the library. */
     function void init() {
+        let two_to_the = Array.new(16);
         let two_to_the[0] = 1;
         let two_to_the[1] = 2;
         let two_to_the[2] = 4;
@@ -27,12 +27,12 @@ class Math {
         let two_to_the[12] = 4096;
         let two_to_the[13] = 8192;
         let two_to_the[14] = 16384;
-        let two_to_the[15] = 32768;
+        let two_to_the[15] = 16384+16384;
         return;
     }
 
     function boolean bit(int x, int n) {
-        return (x & two_to_the[n]) = 1;
+        return ~((x & two_to_the[n]) = 0);
     }
     
     /** Returns the absolute value of x. */
@@ -45,37 +45,27 @@ class Math {
 
     /** Returns the product of x and y. */
     function int multiply(int x, int y) {
-        var int neg_x, neg_y;
         var int sum, shiftedX;
         var int j;
-        var int mask;
-        
-        let neg_x = x < 0;
-        let neg_y = y < 0;
-        let x = Math.abs(x);
-        let y = Math.abs(y);
         
         let sum = 0;
         let shiftedX = x;
         let j = 0;
         while( j < 16 ) {   // 16-bit numbers
-            if(bit(y, j)) {
+            if(Math.bit(y, j)) {
                 let sum = sum + shiftedX;
             }
             let shiftedX = shiftedX + shiftedX;
+            let j = j + 1;
         }
-        if( neg_x = neg_y ) {
-            return result;
-        }
-        else {
-            return -result;
-        }
+        return sum;
     }
     
     /** Returns the integer part of x/y. */
     function int divide(int x, int y) {
         var int neg_x, neg_y;
         var int q;
+        var int result;
         
         let neg_x = x < 0;
         let neg_y = y < 0;
@@ -85,12 +75,12 @@ class Math {
         if( y > x ) {
             return 0;
         }
-        q = Math.divide(x, y+y);
+        let q = Math.divide(x, y+y);
         if( x-(2*q*y) < y ) {
-            result = q+q;
+            let result = q+q;
         }
         else {
-            result = q+q+1;
+            let result = q+q+1;
         }
         
         if( neg_x = neg_y ) {
@@ -103,15 +93,15 @@ class Math {
 
     /** Returns the integer part of the square root of x. */
     function int sqrt(int x) {
-        var int y;
+        var int j, y;
         var int approx;
         
         let y = 0;
         let j = 7;      // = #bits / 2 - 1
         while( ~(j < 0) ) {
-            let approx = two_to_the[j] * two_to_the[j]
-            if( ~(approx > x) & (approx > 0) ) {
-                let y = y + approx
+            let approx = y + two_to_the[j];
+            if( ~((approx*approx) > x) ) {
+                let y = approx;
             }
             let j = j - 1;
         }
@@ -138,3 +128,30 @@ class Math {
         }
     }
 }
+
+//Divide(17,2)
+//x=17, y=2
+//    Divide(17, 4)
+//    x=17, y=4
+//        Divide(17, 8)
+//        x=17, y=8
+//            Divide(17, 16)
+//            x=17, y=16
+//                Divide(17, 32)
+//                x=17, y=32
+//                return 0
+//            q = 0
+//            x-(2*q*y)<y = 17-(2*0*16)<16 = 17-0<16 = 17<16 = false
+//            result = q+q+1 = 0+0+1 = 1
+//            return 1
+//        q = 1
+//        x-(2*q*y)<y = 17-(2*1*8)<8 = 17-16<8 = 1<8 = true
+//        result = q+q = 1+1 = 2
+//        return 2
+//    q = 2
+//    x-(2*q*y)<y = 17-(2*2*4)<4 = 17-16<4 = 1<4 = true
+//    result = q+q = 2+2 = 4
+//q = 4
+//x-(2*q*y)<y = 17-(2*4*2)<2 = 17-16<2 = 1<2 = true
+//result = q+q = 4+4 = 8
+//return 8

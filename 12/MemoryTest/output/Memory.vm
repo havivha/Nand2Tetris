@@ -1,0 +1,444 @@
+function Memory.init 0
+push constant 0
+pop static 0
+push constant 2048
+pop static 1
+push constant 16384
+pop static 2
+push constant 0
+pop static 3
+push constant 1
+pop static 4
+push constant 1
+neg  
+pop static 5
+push static 1
+push static 3
+add  
+push constant 16384
+push constant 2048
+sub  
+pop temp 1
+pop pointer 1
+push temp 1
+pop that 0
+push static 1
+push static 4
+add  
+push constant 0
+pop temp 1
+pop pointer 1
+push temp 1
+pop that 0
+function Memory.peek 0
+push static 0
+push argument 0
+add  
+pop pointer 1
+push that 0
+return  
+function Memory.poke 0
+push static 0
+push argument 0
+add  
+push argument 1
+pop temp 1
+pop pointer 1
+push temp 1
+pop that 0
+push constant 0
+return  
+function Memory.alloc 2
+push pointer 0
+push argument 0
+call Memory.best_fit 2
+pop local 0
+push local 0
+push static 2
+eq  
+not  
+if-goto label2 
+push constant 0
+pop local 1
+goto label1 
+label label2 
+push local 0
+push constant 0
+eq  
+not  
+if-goto label4 
+push static 1
+pop local 1
+push pointer 0
+push local 1
+push argument 0
+call Memory.do_alloc 3
+pop static 1
+goto label3 
+label label4 
+push local 0
+push static 4
+add  
+pop pointer 1
+push that 0
+pop local 1
+push local 0
+push static 4
+add  
+push pointer 0
+push local 1
+push argument 0
+call Memory.do_alloc 3
+pop temp 1
+pop pointer 1
+push temp 1
+pop that 0
+label label3 
+label label1 
+push local 1
+push constant 1
+add  
+return  
+function Memory.best_fit 5
+push static 2
+pop local 0
+push constant 0
+pop local 3
+push static 1
+pop local 2
+push constant 0
+pop local 1
+label label5 
+push local 2
+push constant 0
+eq  
+not  
+not  
+if-goto label6 
+push local 2
+push static 3
+add  
+pop pointer 1
+push that 0
+push constant 1
+sub  
+pop local 4
+push local 4
+push argument 0
+lt  
+not  
+push local 4
+push local 3
+lt  
+and  
+not  
+if-goto label8 
+push local 1
+pop local 0
+push local 4
+pop local 3
+goto label7 
+label label8 
+label label7 
+push local 2
+pop local 1
+push local 2
+push static 4
+add  
+pop pointer 1
+push that 0
+pop local 2
+goto label5 
+label label6 
+push local 0
+return  
+function Memory.do_alloc 2
+push argument 0
+push static 3
+add  
+pop pointer 1
+push that 0
+push argument 1
+push constant 1
+add  
+push constant 2
+add  
+gt  
+not  
+if-goto label10 
+push argument 0
+push argument 1
+add  
+push constant 1
+add  
+pop local 0
+push local 0
+push static 4
+add  
+push argument 0
+push static 4
+add  
+pop pointer 1
+push that 0
+pop temp 1
+pop pointer 1
+push temp 1
+pop that 0
+push local 0
+push static 3
+add  
+push argument 0
+push static 3
+add  
+pop pointer 1
+push that 0
+push local 0
+push argument 0
+sub  
+sub  
+pop temp 1
+pop pointer 1
+push temp 1
+pop that 0
+push argument 0
+push constant 1
+add  
+pop argument 0
+push argument 0
+push ERROR None
+add  
+push argument 1
+push constant 1
+add  
+pop temp 1
+pop pointer 1
+push temp 1
+pop that 0
+goto label9 
+label label10 
+push argument 0
+push static 4
+add  
+pop pointer 1
+push that 0
+pop local 0
+push argument 0
+push static 3
+add  
+pop pointer 1
+push that 0
+pop local 1
+push argument 0
+push constant 1
+add  
+pop argument 0
+push argument 0
+push ERROR None
+add  
+push local 1
+pop temp 1
+pop pointer 1
+push temp 1
+pop that 0
+label label9 
+push local 0
+return  
+function Memory.deAlloc 2
+push argument 0
+push static 5
+add  
+pop pointer 1
+push that 0
+pop local 0
+push argument 0
+push constant 1
+sub  
+pop argument 0
+push pointer 0
+push argument 0
+call Memory.find_prev_free 2
+pop ERROR None
+push ERROR None
+push constant 0
+eq  
+not  
+if-goto label12 
+push argument 0
+push static 3
+add  
+push local 0
+pop temp 1
+pop pointer 1
+push temp 1
+pop that 0
+push argument 0
+push static 4
+add  
+push static 1
+pop temp 1
+pop pointer 1
+push temp 1
+pop that 0
+push argument 0
+pop static 1
+push argument 0
+pop ERROR None
+goto label11 
+label label12 
+push ERROR None
+push ERROR None
+push static 3
+add  
+pop pointer 1
+push that 0
+add  
+push ERROR None
+eq  
+not  
+if-goto label14 
+push ERROR None
+push static 3
+add  
+push ERROR None
+push static 3
+add  
+pop pointer 1
+push that 0
+push local 0
+add  
+pop temp 1
+pop pointer 1
+push temp 1
+pop that 0
+goto label13 
+label label14 
+push argument 0
+push static 3
+add  
+push local 0
+pop temp 1
+pop pointer 1
+push temp 1
+pop that 0
+push argument 0
+push static 4
+add  
+push ERROR None
+push static 4
+add  
+pop pointer 1
+push that 0
+pop temp 1
+pop pointer 1
+push temp 1
+pop that 0
+push ERROR None
+push static 4
+add  
+push argument 0
+pop temp 1
+pop pointer 1
+push temp 1
+pop that 0
+push argument 0
+pop ERROR None
+label label13 
+label label11 
+push ERROR None
+push ERROR None
+push static 3
+add  
+pop pointer 1
+push that 0
+add  
+push ERROR None
+push static 4
+add  
+pop pointer 1
+push that 0
+eq  
+not  
+if-goto label16 
+push ERROR None
+push static 4
+add  
+pop pointer 1
+push that 0
+pop local 1
+push ERROR None
+push static 3
+add  
+push ERROR None
+push static 3
+add  
+pop pointer 1
+push that 0
+push local 1
+push static 3
+add  
+pop pointer 1
+push that 0
+add  
+pop temp 1
+pop pointer 1
+push temp 1
+pop that 0
+push ERROR None
+push static 4
+add  
+push local 1
+push static 4
+add  
+pop pointer 1
+push that 0
+pop temp 1
+pop pointer 1
+push temp 1
+pop that 0
+goto label15 
+label label16 
+label label15 
+push constant 0
+return  
+function Memory.find_prev_free 1
+push static 1
+push argument 0
+gt  
+not  
+if-goto label18 
+push constant 0
+return  
+goto label17 
+label label18 
+label label17 
+push static 1
+pop local 0
+label label19 
+push local 0
+push static 4
+add  
+pop pointer 1
+push that 0
+push constant 0
+eq  
+not  
+push local 0
+push static 4
+add  
+pop pointer 1
+push that 0
+push argument 0
+lt  
+and  
+not  
+if-goto label20 
+push local 0
+push static 4
+add  
+pop pointer 1
+push that 0
+pop local 0
+goto label19 
+label label20 
+push local 0
+return  
