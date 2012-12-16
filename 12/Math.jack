@@ -95,12 +95,14 @@ class Math {
     function int sqrt(int x) {
         var int j, y;
         var int approx;
+        var int approx_squared;
         
         let y = 0;
         let j = 7;      // = #bits / 2 - 1
         while( ~(j < 0) ) {
             let approx = y + two_to_the[j];
-            if( ~((approx*approx) > x) ) {
+            let approx_squared = approx * approx;
+            if( ~(approx_squared > x) & (approx_squared > 0) ) {    // in case of overflow
                 let y = approx;
             }
             let j = j - 1;
