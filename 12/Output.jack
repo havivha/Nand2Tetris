@@ -5,7 +5,7 @@
 
 /**
  * Handles writing characters to the screen.
- * The text screen (256 columns and 512 roes) is divided into 23 text rows (0..22), 
+ * The text screen (256 columns and 512 rows) is divided into 23 text rows (0..22), 
  * each containing 64 text columns (0..63).
  * Each row is 11 pixels high (including 1 space pixel), and 8 pixels wide
  * (including 2 space pixels).
@@ -14,9 +14,13 @@ class Output {
 
     // Character map for printing on the left of a screen word
     static Array charMaps; 
+    
+    static int cursor_x, cursor_y;
 
     /** Initializes the screen and locates the cursor at the screen's top-left. */
     function void init() {
+        let cursor_x = 0;
+        let cursor_y = 0;
     }
 
     // Initalizes the character map array
@@ -65,7 +69,7 @@ class Output {
         do Output.create(64,30,51,51,59,59,59,27,3,30,0,0);  // @
         do Output.create(63,30,51,51,24,12,12,0,12,12,0,0);  // ?
 
-        do Output.create(65,0,0,0,0,0,0,0,0,0,0,0);          // A ** TO BE FILLED **
+        do Output.create(65,12,30,51,51,63,51,51,51,51,0,0); // A
         do Output.create(66,31,51,51,51,31,51,51,51,31,0,0); // B
         do Output.create(67,28,54,35,3,3,3,35,54,28,0,0);    // C
         do Output.create(68,15,27,51,51,51,51,51,27,15,0,0); // D
@@ -131,7 +135,7 @@ class Output {
         do Output.create(125,7,12,12,12,56,12,12,12,7,0,0);    // }
         do Output.create(126,38,45,25,0,0,0,0,0,0,0,0);        // ~
 
-	return;
+        return;
     }
 
     // Creates a character map array of the given char index with the given values.
@@ -171,6 +175,8 @@ class Output {
     /** Moves the cursor to the j’th column of the i’th row,
      *  and erases the character that was there. */
     function void moveCursor(int i, int j) {
+        let cursor_x = j;
+        let cursor_y = i;
     }
 
     /** Prints c at the cursor location and advances the cursor one
@@ -181,17 +187,54 @@ class Output {
     /** Prints s starting at the cursor location, and advances the
      *  cursor appropriately. */
     function void printString(String s) {
+        var int i;
+        let i = 0;
+        while( i < s.length() ) {
+            do Output.printChar(s.charAt(i));
+            let i = i + 1;
+        }
     }
 
     /** Prints i starting at the cursor location, and advances the
      *  cursor appropriately. */
     function void printInt(int i) {
+        var String s;
+        let s = String.new(10);
+        do s.setInt(i);
+        do Output.printString(s);
+        do s.dispose();
+        return;
     }
 
     /** Advances the cursor to the beginning of the next line. */
     function void println() {
+        let cursor_x = 0;
+        if( cursor_y < 22 ) {
+            let cursor_y = cursor_y + 1;
+        }
+        else {
+            do Output.scroll();
+        }
+        return;
     }
 
+    /** Scroll the screen up one line */
+    function void scroll() {
+        var int row;
+        var int col;
+        
+        let row = 0;
+        while( row < 255 ) {
+            let col = 0;
+            while( col < 32 ) {
+                do Output.
+                let col = col + 1;
+            }
+            let row = row + 1;
+        }
+        return;
+    }
+    
     /** Moves the cursor one column back. */
     function void backSpace() {
     }

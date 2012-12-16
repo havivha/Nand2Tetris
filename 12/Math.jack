@@ -7,32 +7,36 @@
  * A basic math library.
  */
 class Math {
-    static int two_to_the;
+    static int powers_of_two;
     
     /** Initializes the library. */
     function void init() {
-        let two_to_the = Array.new(16);
-        let two_to_the[0] = 1;
-        let two_to_the[1] = 2;
-        let two_to_the[2] = 4;
-        let two_to_the[3] = 8;
-        let two_to_the[4] = 16;
-        let two_to_the[5] = 32;
-        let two_to_the[6] = 64;
-        let two_to_the[7] = 128;
-        let two_to_the[8] = 256;
-        let two_to_the[9] = 512;
-        let two_to_the[10] = 1024;
-        let two_to_the[11] = 2048;
-        let two_to_the[12] = 4096;
-        let two_to_the[13] = 8192;
-        let two_to_the[14] = 16384;
-        let two_to_the[15] = 16384+16384;
+        let powers_of_two = Array.new(16);
+        let powers_of_two[0] = 1;
+        let powers_of_two[1] = 2;
+        let powers_of_two[2] = 4;
+        let powers_of_two[3] = 8;
+        let powers_of_two[4] = 16;
+        let powers_of_two[5] = 32;
+        let powers_of_two[6] = 64;
+        let powers_of_two[7] = 128;
+        let powers_of_two[8] = 256;
+        let powers_of_two[9] = 512;
+        let powers_of_two[10] = 1024;
+        let powers_of_two[11] = 2048;
+        let powers_of_two[12] = 4096;
+        let powers_of_two[13] = 8192;
+        let powers_of_two[14] = 16384;
+        let powers_of_two[15] = 16384+16384;
         return;
     }
 
     function boolean bit(int x, int n) {
-        return ~((x & two_to_the[n]) = 0);
+        return ~((x & powers_of_two[n]) = 0);
+    }
+    
+    function int two_to_the(int power) {
+        return powers_of_two[power];
     }
     
     /** Returns the absolute value of x. */
@@ -108,7 +112,7 @@ class Math {
         let y = 0;
         let j = 7;      // = #bits / 2 - 1
         while( ~(j < 0) ) {
-            let approx = y + two_to_the[j];
+            let approx = y + powers_of_two[j];
             let approx_squared = approx * approx;
             if( ~(approx_squared > x) & (approx_squared > 0) ) {    // in case of overflow
                 let y = approx;
