@@ -90,6 +90,14 @@ class Math {
             return -result;
         }
     }
+    
+    /** Returns the remainder part of x/y */
+    function int mod(int x, int y) {
+        var int q;
+        
+        let q = Math.divide(x, y);
+        return x - (q*y);
+    }
 
     /** Returns the integer part of the square root of x. */
     function int sqrt(int x) {

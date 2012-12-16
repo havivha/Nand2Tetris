@@ -13,14 +13,19 @@ class String {
     
     /** Constructs a new empty String with a maximum length of maxLength. */
     constructor String new(int maxLength) {
+        if( maxLength = 0 ) {
+            let maxLength = 1;
+        }
         let buffer = Array.new(maxLength);
         let buffer_len = maxLength;
         let str_len = 0;
+        return this;
     }
 
     /** De-allocates the string and frees its space. */
     method void dispose() {
         do Array.dispose(buffer);
+        return;
     }
 
     /** Returns the current length of this String. */
@@ -36,35 +41,117 @@ class String {
     /** Sets the j'th character of this string to be c. */
     method void setCharAt(int j, char c) {
         let buffer[j] = c;
+        return;
     }
 
     /** Appends the character c to the end of this String.
      *  Returns this string as the return value. */
     method String appendChar(char c) {
+        if( str_len < buffer_len ) {
+            let buffer[str_len] = c;
+            let str_len = str_len + 1;
+        }
+        return this;
     }
 
     /** Erases the last character from this String. */
     method void eraseLastChar() {
+        if( str_len > 0 ) {
+            let str_len = str_len - 1;
+        }
+        return;
     }
 
     /** Returns the integer value of this String until the first non
      *  numeric character. */
     method int intValue() {
+        var int int_val;
+        var int i;
+        var boolean neg;
+        
+        let int_val = 0;
+        
+        if( (str_len > 0) & (buffer[0] = 45) ) {      // '-'
+            let neg = true;
+            let i = 1;
+        }
+        else {
+            let neg = false;
+            let i = 0;
+        }
+        
+        while( (i < str_len) & String.is_digit(buffer[i]) ) {
+            let int_val = (int_val * 10) + String.digit_val(buffer[i]);
+            let i = i + 1;
+        }
+        
+        if( neg ) {
+            return -int_val;
+        }
+        else {
+            return int_val;
+        }
+    }
+    
+    /** Returns whether the given char is a digit or not */
+    function boolean is_digit(char c) {
+        return ~(c < 48) & ~(c > 57);
+    }
+    
+    /** Returns the integer value of the given digit character */
+    function int digit_val(char c) {
+        return c - 48;
+    }
+    
+    /** Returns the char value of the given integer (must have 0<=value<=9) */
+    function char digit_char(int i) {
+        return i + 48;
     }
 
     /** Sets this String to hold a representation of the given number. */
     method void setInt(int number) {
+        let str_len = 0;    // Clear string
+        
+        if( number < 0 ) {
+            let number = -number;
+            do appendChar(45);      // leading '-'
+        }
+        
+        do do_set_int(number);
+        return;
     }
 
+    method void do_set_int(int number) {
+        var int q;
+        var int mod;
+        var char c;
+        
+        let q = number / 10;
+        let mod = number - (q*10);
+        let c = String.digit_char(mod);
+        
+        if( number < 10 ) {
+            do appendChar(c);
+        }
+        else {
+            do do_set_int(q);
+            do appendChar(c);
+        }
+        return;
+    }
+    
     /** Returns the new line character. */
     function char newLine() {
+        return 128;
     }
 
     /** Returns the backspace character. */
     function char backSpace() {
+        return 129;
     }
 
     /** Returns the double quote (") character. */
     function char doubleQuote() {
+        return 34;
     }
 }
