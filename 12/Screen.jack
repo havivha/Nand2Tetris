@@ -48,7 +48,7 @@ class Screen {
         var int mask;
 
         let address = (y*32) + (x/16);
-        let mask = Math.two_to_the(Math.mod(x,16));
+        let mask = Math.two_to_the(x & 15));
 
         if( cur_colour ) {
             let screen[address] = screen[address] | mask;
@@ -142,8 +142,8 @@ class Screen {
         var int start_addr, end_addr;
         var int x1mod16, x2mod16;
         
-        let x1mod16 = Math.mod(x1, 16);
-        let x2mod16 = Math.mod(x2, 16);
+        let x1mod16 = x1 & 15;
+        let x2mod16 = x2 & 15;
         let start_addr = (y*32) + (x1/16);
         let end_addr = (y*32) + (x2/16) + (x2mod16=0);
 
