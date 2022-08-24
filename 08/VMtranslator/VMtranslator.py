@@ -11,7 +11,8 @@ class VMTranslator(object):
     def translate_all(self, infiles, outfile):
         if infiles != []:
             code_writer = CodeWriter.CodeWriter(outfile)
-            code_writer.write_init()
+            if len(infiles)>1:
+                code_writer.write_init()
             for infile in infiles:
                 self._translate(infile, code_writer)
             code_writer.close_file()
